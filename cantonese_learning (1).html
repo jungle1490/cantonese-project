@@ -1,0 +1,2359 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>粵語學習助手</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0e0f11;
+  --surface: #16181c;
+  --surface2: #1e2126;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
+  --text: #e8e6e0;
+  --text2: #8a8880;
+  --text3: #555450;
+  --amber: #e8a838;
+  --amber-dim: rgba(232,168,56,0.12);
+  --teal: #3ec4a0;
+  --teal-dim: rgba(62,196,160,0.1);
+  --blue: #5b9cf6;
+  --blue-dim: rgba(91,156,246,0.1);
+  --pink: #e06b8a;
+  --pink-dim: rgba(224,107,138,0.1);
+  --green: #6bcb8a;
+  --green-dim: rgba(107,203,138,0.1);
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  min-height: 100vh;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* Layout */
+.app { display: flex; min-height: 100vh; }
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+.main { flex: 1; padding: 32px; max-width: 860px; overflow-x: hidden; }
+
+/* Sidebar */
+.logo {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--amber);
+  padding: 4px 8px 20px;
+  letter-spacing: .02em;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--text2);
+  font-size: 13px;
+  font-weight: 400;
+  transition: all .15s;
+  border: 1px solid transparent;
+}
+.nav-item:hover { background: var(--surface2); color: var(--text); }
+.nav-item.active { background: var(--amber-dim); color: var(--amber); border-color: rgba(232,168,56,0.2); }
+.nav-icon { font-size: 15px; width: 18px; text-align: center; }
+.nav-sep { height: 1px; background: var(--border); margin: 8px 0; }
+
+/* Panels */
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* Page title */
+.page-title {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.page-sub { font-size: 13px; color: var(--text2); margin-bottom: 28px; }
+
+/* Cards */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  margin-bottom: 14px;
+}
+.card-title { font-size: 13px; font-weight: 500; color: var(--text2); margin-bottom: 12px; text-transform: uppercase; letter-spacing: .06em; }
+
+/* Today's plan */
+.today-highlight { border-color: rgba(232,168,56,0.3); background: linear-gradient(135deg, rgba(232,168,56,0.05) 0%, var(--surface) 60%); }
+.today-badge {
+  display: inline-block;
+  background: var(--amber);
+  color: #0e0f11;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-bottom: 14px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.block-row { display: flex; flex-direction: column; gap: 8px; }
+.time-block {
+  display: flex;
+  align-items: stretch;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.tb-time {
+  width: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+.tb-amber { background: rgba(232,168,56,0.15); color: var(--amber); }
+.tb-teal { background: rgba(62,196,160,0.12); color: var(--teal); }
+.tb-blue { background: rgba(91,156,246,0.12); color: var(--blue); }
+.tb-body { flex: 1; padding: 10px 14px; background: var(--surface2); }
+.tb-name { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
+.tb-desc { font-size: 11px; color: var(--text2); line-height: 1.5; }
+.tb-tool { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text3); margin-top: 4px; }
+
+/* Progress */
+.progress-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.progress-card { background: var(--surface2); border-radius: var(--radius-sm); padding: 14px 16px; }
+.pc-label { font-size: 11px; color: var(--text2); margin-bottom: 8px; }
+.pc-val { font-size: 22px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
+.pc-bar { height: 4px; background: var(--border2); border-radius: 2px; overflow: hidden; }
+.pc-fill { height: 100%; border-radius: 2px; transition: width .6s ease; }
+
+/* Week schedule */
+.week-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.week-row:last-child { border-bottom: none; }
+.wr-week { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text3); width: 52px; flex-shrink: 0; padding-top: 2px; }
+.wr-content { flex: 1; }
+.wr-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+.wr-detail { font-size: 11px; color: var(--text2); }
+.wr-badge { font-size: 10px; padding: 2px 8px; border-radius: 10px; margin-left: 8px; font-weight: 500; }
+.badge-now { background: var(--amber-dim); color: var(--amber); border: 1px solid rgba(232,168,56,0.3); }
+.badge-next { background: var(--teal-dim); color: var(--teal); border: 1px solid rgba(62,196,160,0.2); }
+.badge-later { background: var(--surface2); color: var(--text2); border: 1px solid var(--border2); }
+.tone-pill {
+  display: inline-block;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  padding: 1px 7px;
+  border-radius: 4px;
+  border: 1px solid var(--border2);
+  background: var(--surface2);
+  color: var(--text);
+  margin: 1px 2px;
+}
+
+/* Tone trainer */
+.tone-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+.tone-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  cursor: pointer;
+  transition: all .18s;
+  position: relative;
+  overflow: hidden;
+}
+.tone-card:hover { border-color: var(--border2); transform: translateY(-1px); }
+.tone-card.selected { border-color: var(--amber); background: var(--amber-dim); }
+.tone-card.correct { border-color: var(--teal); background: var(--teal-dim); animation: pop .25s ease; }
+.tone-card.wrong { border-color: var(--pink); background: var(--pink-dim); animation: shake .25s ease; }
+@keyframes pop { 0%,100%{transform:scale(1)} 50%{transform:scale(1.04)} }
+@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
+.tc-num { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text3); margin-bottom: 4px; }
+.tc-cant { font-family: 'Noto Serif TC', serif; font-size: 28px; color: var(--text); margin-bottom: 2px; }
+.tc-jyut { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--amber); }
+.tc-name { font-size: 11px; color: var(--text2); margin-top: 3px; }
+
+.quiz-area {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  text-align: center;
+  margin-bottom: 14px;
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.quiz-word { font-family: 'Noto Serif TC', serif; font-size: 52px; margin-bottom: 6px; color: var(--text); }
+.quiz-hint { font-size: 13px; color: var(--text2); margin-bottom: 4px; }
+.quiz-jyut { font-family: 'DM Mono', monospace; font-size: 14px; color: var(--teal); display: none; }
+.quiz-result { font-size: 15px; font-weight: 500; margin-top: 8px; min-height: 22px; }
+.quiz-result.correct { color: var(--teal); }
+.quiz-result.wrong { color: var(--pink); }
+
+.choice-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+.choice-btn {
+  padding: 10px 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all .15s;
+  text-align: center;
+}
+.choice-btn:hover { border-color: var(--border2); background: var(--surface); }
+.choice-btn.correct { background: var(--teal-dim); border-color: var(--teal); color: var(--teal); }
+.choice-btn.wrong { background: var(--pink-dim); border-color: var(--pink); color: var(--pink); }
+
+.score-row { display: flex; gap: 12px; align-items: center; }
+.score-stat { text-align: center; }
+.score-num { font-size: 28px; font-weight: 500; color: var(--text); }
+.score-label { font-size: 11px; color: var(--text2); }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 18px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .15s;
+}
+.btn:hover { background: var(--surface2); border-color: var(--border2); }
+.btn-primary { background: var(--amber); border-color: var(--amber); color: #0e0f11; font-weight: 600; }
+.btn-primary:hover { background: #d4962e; border-color: #d4962e; }
+
+/* Vocab browser */
+.vocab-filters { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+.filter-btn {
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text2);
+  font-family: 'Outfit', sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all .15s;
+}
+.filter-btn:hover { border-color: var(--border2); color: var(--text); }
+.filter-btn.active { background: var(--amber-dim); border-color: rgba(232,168,56,0.3); color: var(--amber); }
+
+.vocab-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.vocab-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: all .15s;
+}
+.vocab-card:hover { border-color: var(--border2); }
+.vocab-card.revealed { border-color: rgba(62,196,160,0.3); }
+.vc-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+.vc-char { font-family: 'Noto Serif TC', serif; font-size: 22px; color: var(--text); }
+.vc-jyut { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--amber); }
+.vc-tone-badge {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'DM Mono', monospace;
+}
+.vc-meaning { font-size: 12px; color: var(--text2); display: none; margin-top: 4px; border-top: 1px solid var(--border); padding-top: 6px; }
+.vc-hint { font-size: 11px; color: var(--text3); margin-top: 3px; display: none; }
+.vocab-card.revealed .vc-meaning { display: block; }
+.vocab-card.revealed .vc-hint { display: block; }
+.vc-day { font-size: 10px; color: var(--text3); font-family: 'DM Mono', monospace; }
+
+/* Rules */
+.rule-item { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.rule-item:last-child { border-bottom: none; }
+.rule-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+.rule-body { font-size: 13px; color: var(--text2); line-height: 1.65; }
+.rule-body b { color: var(--text); font-weight: 500; }
+
+/* Tone curve SVG */
+.tone-curves { margin-bottom: 14px; }
+
+/* Speak button */
+.speak-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all .15s;
+  flex-shrink: 0;
+  font-size: 13px;
+  line-height: 1;
+}
+.speak-btn:hover { background: var(--surface2); color: var(--amber); border-color: rgba(232,168,56,0.4); }
+.speak-btn.playing { background: var(--amber-dim); color: var(--amber); border-color: rgba(232,168,56,0.5); }
+.speak-btn.no-voice { color: var(--text3); cursor: default; }
+
+/* Quiz speak button — larger, centered above word */
+.quiz-speak {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  color: var(--text2);
+  cursor: pointer;
+  transition: all .18s;
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+.quiz-speak:hover { background: var(--amber-dim); color: var(--amber); border-color: rgba(232,168,56,0.4); }
+.quiz-speak.playing { background: var(--amber-dim); color: var(--amber); border-color: rgba(232,168,56,0.6); animation: pulse .6s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
+
+/* Tone card speak */
+.tone-card-speak {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text3);
+  cursor: pointer;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .15s;
+}
+.tone-card-speak:hover { color: var(--amber); border-color: rgba(232,168,56,0.4); background: var(--amber-dim); }
+
+.voice-notice {
+  font-size:11px;
+  color:var(--text3);
+  padding: 8px 12px;
+  background: var(--surface2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  margin-bottom: 12px;
+  display: none;
+}
+
+/* Vocab progress */
+.vocab-progress-bar {
+  margin-bottom: 16px;
+}
+.vp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.vp-title { font-size: 12px; font-weight: 500; color: var(--text2); }
+.vp-count { font-size: 12px; font-family: 'DM Mono', monospace; color: var(--amber); }
+.vp-track {
+  height: 5px;
+  background: var(--surface2);
+  border-radius: 3px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.vp-fill {
+  height: 100%;
+  background: var(--amber);
+  border-radius: 3px;
+  transition: width .4s ease;
+}
+.vp-fill.complete { background: var(--teal); }
+
+.day-progress-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.dp-cell {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 6px;
+  text-align: center;
+}
+.dp-label { font-size: 10px; color: var(--text3); font-family: 'DM Mono', monospace; margin-bottom: 4px; }
+.dp-pct { font-size: 13px; font-weight: 500; color: var(--text2); margin-bottom: 4px; }
+.dp-pct.done { color: var(--teal); }
+.dp-mini { height: 3px; background: var(--border2); border-radius: 2px; overflow: hidden; }
+.dp-mini-fill { height: 100%; border-radius: 2px; background: var(--amber); transition: width .3s; }
+.dp-mini-fill.done { background: var(--teal); }
+
+.vocab-card.reviewed {
+  border-color: rgba(62,196,160,0.25);
+}
+.vocab-card.reviewed .vc-char { opacity: 0.7; }
+.vc-check {
+  font-size: 11px;
+  color: var(--teal);
+  font-family: 'DM Mono', monospace;
+  margin-top: 4px;
+  display: none;
+}
+.vocab-card.reviewed .vc-check { display: block; }
+
+/* Task check button */
+.task-check-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border2);
+  background: transparent;
+  color: var(--text3);
+  font-size: 13px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all .15s;
+  margin-top: 2px;
+}
+.task-check-btn:hover { border-color: var(--teal); color: var(--teal); }
+.task-check-btn.task-done {
+  background: var(--teal-dim);
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
+/* Card note */
+.card-note-area {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: var(--font-sans, inherit);
+  font-size: 11px;
+  padding: 6px 8px;
+  resize: none;
+  margin-top: 6px;
+  line-height: 1.5;
+  transition: border-color .15s;
+  display: none;
+}
+.card-note-area:focus { outline: none; border-color: var(--amber); }
+.vocab-card.revealed .card-note-area { display: block; }
+.note-indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--amber);
+  display: none;
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+.has-note .note-indicator { display: inline-block; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+/* Mobile */
+@media(max-width:680px){
+  .sidebar{ width:100%; height:auto; position:static; flex-direction:row; flex-wrap:wrap; padding:12px; gap:4px; }
+  .logo{ display:none; }
+  .nav-sep{ display:none; }
+  .main{ padding:16px; }
+  .tone-grid, .choice-grid{ grid-template-columns:repeat(3,1fr); }
+  .vocab-grid, .progress-grid{ grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<nav class="sidebar">
+  <div class="logo">粵語</div>
+  <div style="font-size:10px;padding:0 8px 10px;color:var(--text3)" id="sync-status">未設定 Supabase</div>
+  <div class="nav-item active" onclick="showPanel('today')"><span class="nav-icon">◈</span>今日課表</div>
+  <div class="nav-item" onclick="showPanel('schedule')"><span class="nav-icon">◷</span>完整計劃</div>
+  <div class="nav-sep"></div>
+  <div class="nav-item" onclick="showPanel('tones')"><span class="nav-icon">♩</span>聲調圖解</div>
+  <div class="nav-item" onclick="showPanel('quiz')"><span class="nav-icon">◎</span>聲調練習</div>
+  <div class="nav-sep"></div>
+  <div class="nav-item" onclick="showPanel('vocab')"><span class="nav-icon">◻</span>詞卡瀏覽</div>
+  <div class="nav-sep"></div>
+  <div class="nav-item" onclick="showPanel('rules')"><span class="nav-icon">◇</span>學習原則</div>
+</nav>
+
+<main class="main">
+
+<!-- TODAY -->
+<div id="panel-today" class="panel active">
+  <div class="page-title">今日課表</div>
+  <div class="page-sub" id="today-sub">每晚睡前 40 分鐘 · 第一階段（週 1–8）</div>
+
+  <!-- Start date setup -->
+  <div id="start-setup-card" class="card" style="border-color:rgba(232,168,56,0.3);background:rgba(232,168,56,0.05);display:none">
+    <div class="card-title" style="color:var(--amber)">設定開始日期</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6">
+      設定你第一次練習的日期，網頁就會自動計算今天是第幾天、第幾週。
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <input type="date" id="start-date-input" style="padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:var(--surface2);color:var(--text);font-family:inherit;font-size:13px;">
+      <button class="btn btn-primary" onclick="saveStartDate()">確認開始</button>
+    </div>
+  </div>
+
+  <!-- Day counter banner -->
+  <div id="day-banner" class="card" style="display:none;border-color:rgba(232,168,56,0.3);background:rgba(232,168,56,0.05);padding:16px 22px">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <div>
+        <div style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:2px">今天</div>
+        <div style="font-size:22px;font-weight:500;color:var(--amber)" id="day-counter-big">Day 1</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:2px" id="day-week-label">第 1 週 · 共 56 天</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px">本週聲調任務</div>
+        <div style="font-size:13px;font-weight:500;color:var(--text)" id="day-tone-task">陰平 1 vs 陽平 4</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px" id="day-anki-task">今日詞卡：Day 1（10 張）</div>
+      </div>
+    </div>
+    <div style="margin-top:12px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:4px">
+        <span>第一階段進度</span><span id="day-phase-pct">0%</span>
+      </div>
+      <div style="height:4px;background:var(--surface2);border-radius:2px;overflow:hidden;border:1px solid var(--border)">
+        <div id="day-phase-fill" style="height:100%;border-radius:2px;background:var(--amber);transition:width .4s ease;width:0%"></div>
+      </div>
+    </div>
+    <div style="margin-top:10px;font-size:11px;color:var(--text3)">
+      <span id="day-reset-link" style="cursor:pointer;text-decoration:underline;color:var(--text3)" onclick="resetStartDate()">重設開始日期</span>
+    </div>
+  </div>
+
+  <!-- Early finish notice (shown dynamically) -->
+  <div id="early-finish-card" class="card" style="display:none;border-color:rgba(62,196,160,0.3);background:rgba(62,196,160,0.05)">
+    <div class="card-title" style="color:var(--teal)">今天提早做完了</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.7" id="early-finish-body"></div>
+  </div>
+
+  <div class="card today-highlight">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div class="today-badge" id="today-badge-label" style="margin-bottom:0">今晚練習</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:11px;color:var(--text3)">連續</span>
+        <span id="streak-badge" style="font-size:13px;font-weight:500;color:var(--amber)">—</span>
+      </div>
+    </div>
+    <div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:5px">
+        <span id="today-complete-txt">0 / 3 完成</span>
+        <span>今日進度</span>
+      </div>
+      <div style="height:4px;background:var(--surface2);border-radius:2px;overflow:hidden;border:1px solid var(--border)">
+        <div id="today-complete-bar" style="height:100%;border-radius:2px;background:var(--amber);transition:width .3s;width:0%"></div>
+      </div>
+    </div>
+    <div class="block-row" id="today-block-row">
+      <div class="time-block">
+        <div class="tb-time tb-amber">10 分</div>
+        <div class="tb-body" style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+          <div style="flex:1">
+            <div class="tb-name">聲調聽辨訓練</div>
+            <div class="tb-desc" id="today-tone-desc">週 1–2：只練 <strong>陰平 1 vs 陽平 4</strong>。聽「詩 si1 / 時 si4」反覆辨別。</div>
+            <div class="tb-tool">→ 點左側「聲調練習」開始</div>
+          </div>
+          <button id="task-tone" class="task-check-btn" onclick="toggleTodayTask('tone',this)" title="標記完成">✓</button>
+        </div>
+      </div>
+      <div class="time-block">
+        <div class="tb-time tb-teal">15 分</div>
+        <div class="tb-body" style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+          <div style="flex:1">
+            <div class="tb-name">Anki 詞卡複習</div>
+            <div class="tb-desc" id="today-anki-desc">每天新增 10 張，正面播音頻，背面才看字義。</div>
+            <div class="tb-tool">→ 點左側「詞卡瀏覽」預習本週詞彙</div>
+          </div>
+          <button id="task-anki" class="task-check-btn" onclick="toggleTodayTask('anki',this)" title="標記完成">✓</button>
+        </div>
+      </div>
+      <div class="time-block">
+        <div class="tb-time tb-blue">15 分</div>
+        <div class="tb-body" style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+          <div style="flex:1">
+            <div class="tb-name">分級聽力輸入</div>
+            <div class="tb-desc">放鬆聽，不求全懂，只追「聽到幾個詞」的感覺。</div>
+            <div class="tb-tool">工具：Glossika 粵語 / CantoDict 例句音頻</div>
+          </div>
+          <button id="task-listen" class="task-check-btn" onclick="toggleTodayTask('listen',this)" title="標記完成">✓</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">本週進度</div>
+    <div class="progress-grid">
+      <div class="progress-card">
+        <div class="pc-label">聲調目標</div>
+        <div class="pc-val" id="today-tone-target">陰平 vs 陽平</div>
+        <div class="pc-bar"><div class="pc-fill" id="today-tone-bar" style="width:0%;background:#e8a838"></div></div>
+      </div>
+      <div class="progress-card">
+        <div class="pc-label">Anki 詞卡</div>
+        <div class="pc-val" id="today-anki-target">今日 Day 1</div>
+        <div class="pc-bar"><div class="pc-fill" id="today-anki-bar" style="width:0%;background:#3ec4a0"></div></div>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--text3);line-height:1.6">
+      睡前練習完後，寫下今天錯最多次的聲調對，明天的熱身從它開始。
+    </div>
+  </div>
+
+  <div class="card" style="border-color:rgba(224,107,138,0.2);background:rgba(224,107,138,0.04)">
+    <div class="card-title" style="color:var(--pink)">本階段不做的事</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.7">
+      不開口說話 · 不背場景句型 · 不看原版港劇 · 不造句<br>
+      <span style="font-size:11px;color:var(--text3)">底層聲調感知沒建好之前，這些輸入對大腦來說都是雜訊。</span>
+    </div>
+  </div>
+</div>
+
+<!-- SCHEDULE -->
+<div id="panel-schedule" class="panel">
+  <div class="page-title">完整學習計劃</div>
+  <div class="page-sub">三個階段 · 以研究為基礎 · 完全自學</div>
+
+  <div class="card">
+    <div class="card-title">第一階段 — 感知底層（週 1–8）</div>
+    <div class="week-row">
+      <div class="wr-week">週 1–2</div>
+      <div class="wr-content">
+        <div class="wr-title">陰平 vs 陽平 <span class="wr-badge badge-now">現在</span></div>
+        <div class="wr-detail">
+          <span class="tone-pill">詩 si1 高平</span><span class="tone-pill">時 si4 低平</span>
+          · Anki Day 1–14（140 張）
+        </div>
+      </div>
+    </div>
+    <div class="week-row">
+      <div class="wr-week">週 3–4</div>
+      <div class="wr-content">
+        <div class="wr-title">陰上 vs 陽上 <span class="wr-badge badge-next">下一步</span></div>
+        <div class="wr-detail">
+          <span class="tone-pill">史 si2 高升</span><span class="tone-pill">市 si5 低升</span>
+          · Anki Day 15–28（280 張累計）
+        </div>
+      </div>
+    </div>
+    <div class="week-row">
+      <div class="wr-week">週 5–6</div>
+      <div class="wr-content">
+        <div class="wr-title">陰去 vs 陽去 + 入聲截斷感 <span class="wr-badge badge-later">之後</span></div>
+        <div class="wr-detail">
+          <span class="tone-pill">試 si3 高降</span><span class="tone-pill">事 si6 低降</span><span class="tone-pill">食 sik9 低入</span>
+          · Anki 加入入聲詞
+        </div>
+      </div>
+    </div>
+    <div class="week-row">
+      <div class="wr-week">週 7–8</div>
+      <div class="wr-content">
+        <div class="wr-title">9 調混合測試 <span class="wr-badge badge-later">之後</span></div>
+        <div class="wr-detail">全部隨機辨別，不分組 · Anki 累計約 560 張在循環</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">第二階段 — 詞彙密度（週 9–16）</div>
+    <div class="week-row">
+      <div class="wr-week">週 9–12</div>
+      <div class="wr-content">
+        <div class="wr-title">Anki 加速 + 港劇短片段（附字幕）</div>
+        <div class="wr-detail">每天 20 分 Anki，目標 800–1000 詞 · ViuTV 片段 3–5 分鐘</div>
+      </div>
+    </div>
+    <div class="week-row">
+      <div class="wr-week">週 13–16</div>
+      <div class="wr-content">
+        <div class="wr-title">Shadowing 跟讀（+5 分）</div>
+        <div class="wr-detail">跟著 Anki 音頻同步念出，從單詞開始，不跳句子</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">第三階段 — 輸出啟動（週 17+）</div>
+    <div class="week-row">
+      <div class="wr-week">週 17+</div>
+      <div class="wr-content">
+        <div class="wr-title">場景句型 + 原版港劇（無字幕）</div>
+        <div class="wr-detail">Anki 維護模式 · Glossika 場景句型 · 感知系統已就位才看無字幕</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="border-color:rgba(232,168,56,0.2);background:var(--amber-dim)">
+    <div class="card-title" style="color:var(--amber)">加速進度的唯一有效方式</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.7">
+      將 Anki 時間從 15 分鐘增加到 30 分鐘，詞彙量累積更快，第二階段的場景練習會跟著加速。<br>
+      <span style="font-size:11px;color:var(--text3)">聲調練習時間不建議壓縮——感知類別的建立有生理上的時間下限。</span>
+    </div>
+  </div>
+</div>
+
+<!-- TONES MAP -->
+<div id="panel-tones" class="panel">
+  <div class="page-title">9 個聲調圖解</div>
+  <div class="page-sub">同一字根「si / sik」展示全部聲調 · 點擊卡片查看說明</div>
+
+  <div class="card">
+    <svg width="100%" viewBox="0 0 640 200" style="margin-bottom:8px">
+      <text x="12" y="30" font-size="10" fill="#555450" font-family="DM Mono, monospace">高</text>
+      <text x="12" y="105" font-size="10" fill="#555450" font-family="DM Mono, monospace">中</text>
+      <text x="12" y="178" font-size="10" fill="#555450" font-family="DM Mono, monospace">低</text>
+      <line x1="28" y1="22" x2="28" y2="188" stroke="#2a2c30" stroke-width="1"/>
+      <line x1="25" y1="30" x2="28" y2="30" stroke="#2a2c30" stroke-width="1"/>
+      <line x1="25" y1="105" x2="28" y2="105" stroke="#2a2c30" stroke-width="1"/>
+      <line x1="25" y1="178" x2="28" y2="178" stroke="#2a2c30" stroke-width="1"/>
+      <!-- 1 陰平: 高平 -->
+      <line x1="48" y1="34" x2="110" y2="34" stroke="#e8a838" stroke-width="2.5" stroke-linecap="round"/>
+      <polygon points="106,29 114,34 106,39" fill="#e8a838"/>
+      <text x="48" y="24" font-size="10" fill="#e8a838" font-family="DM Mono, monospace">1 陰平</text>
+      <text x="48" y="52" font-size="11" fill="#8a8880" font-family="Noto Serif TC, serif">詩 si1</text>
+      <!-- 2 陰上: 高升 -->
+      <line x1="145" y1="105" x2="207" y2="34" stroke="#5b9cf6" stroke-width="2.5" stroke-linecap="round"/>
+      <polygon points="200,29 210,31 205,40" fill="#5b9cf6"/>
+      <text x="145" y="24" font-size="10" fill="#5b9cf6" font-family="DM Mono, monospace">2 陰上</text>
+      <text x="145" y="128" font-size="11" fill="#8a8880" font-family="Noto Serif TC, serif">史 si2</text>
+      <!-- 3 陰去: 高降 -->
+      <line x1="240" y1="44" x2="302" y2="120" stroke="#a78bfa" stroke-width="2.5" stroke-linecap="round"/>
+      <polygon points="296,118 306,122 300,112" fill="#a78bfa"/>
+      <text x="240" y="34" font-size="10" fill="#a78bfa" font-family="DM Mono, monospace">3 陰去</text>
+      <text x="240" y="143" font-size="11" fill="#8a8880" font-family="Noto Serif TC, serif">試 si3</text>
+      <!-- 4 陽平: 低平 -->
+      <line x1="48" y1="170" x2="110" y2="170" stroke="#f97316" stroke-width="2.5" stroke-linecap="round"/>
+      <polygon points="106,165 114,170 106,175" fill="#f97316"/>
+      <text x="48" y="160" font-size="10" fill="#f97316" font-family="DM Mono, monospace">4 陽平</text>
+      <text x="48" y="188" font-size="11" fill="#8a8880" font-family="Noto Serif TC, serif">時 si4</text>
+      <!-- 5 陽上: 低升 -->
+      <line x1="145" y1="170" x2="207" y2="120" stroke="#3ec4a0" stroke-width="2.5" stroke-linecap="round"/>
+      <polygon points="200,116 210,120 202,128" fill="#3ec4a0"/>
+      <text x="145" y="160" font-size="10" fill="#3ec4a0" font-family="DM Mono, monospace">5 陽上</text>
+      <text x="145" y="188" font-size="11" fill="#8a8880" font-family="Noto Serif TC, serif">市 si5</text>
+      <!-- 6 陽去: 低降 -->
+      <line x1="240" y1="120" x2="302" y2="170" stroke="#8a8880" stroke-width="2.5" stroke-linecap="round"/>
+      <polygon points="296,168 306,172 298,162" fill="#8a8880"/>
+      <text x="240" y="110" font-size="10" fill="#8a8880" font-family="DM Mono, monospace">6 陽去</text>
+      <text x="240" y="188" font-size="11" fill="#8a8880" font-family="Noto Serif TC, serif">事 si6</text>
+      <!-- Divider -->
+      <line x1="340" y1="10" x2="340" y2="190" stroke="#2a2c30" stroke-width="1" stroke-dasharray="4 3"/>
+      <text x="460" y="16" font-size="10" fill="#555450" font-family="DM Mono, monospace" text-anchor="middle">入聲（短促收尾 -k）</text>
+      <!-- 7 陰入 -->
+      <rect x="360" y="26" width="60" height="26" rx="5" fill="rgba(224,107,138,0.15)" stroke="#e06b8a" stroke-width="1"/>
+      <text x="390" y="44" font-size="12" fill="#e06b8a" font-family="Noto Serif TC, serif" text-anchor="middle">色 sik7</text>
+      <text x="390" y="66" font-size="10" fill="#8a8880" font-family="DM Mono, monospace" text-anchor="middle">高入</text>
+      <!-- 8 中入 -->
+      <rect x="360" y="90" width="60" height="26" rx="5" fill="rgba(224,107,138,0.10)" stroke="#e06b8a" stroke-width="1"/>
+      <text x="390" y="108" font-size="12" fill="#e06b8a" font-family="Noto Serif TC, serif" text-anchor="middle">錫 sik8</text>
+      <text x="390" y="130" font-size="10" fill="#8a8880" font-family="DM Mono, monospace" text-anchor="middle">中入</text>
+      <!-- 9 陽入 -->
+      <rect x="360" y="154" width="60" height="26" rx="5" fill="rgba(224,107,138,0.06)" stroke="#e06b8a" stroke-width="1"/>
+      <text x="390" y="172" font-size="12" fill="#e06b8a" font-family="Noto Serif TC, serif" text-anchor="middle">食 sik9</text>
+      <text x="390" y="193" font-size="10" fill="#8a8880" font-family="DM Mono, monospace" text-anchor="middle">低入</text>
+      <!-- annotations -->
+      <text x="470" y="50" font-size="11" fill="#555450" font-family="Outfit, sans-serif">平聲 1+4 = 平著走</text>
+      <text x="470" y="95" font-size="11" fill="#555450" font-family="Outfit, sans-serif">上聲 2+5 = 往上升</text>
+      <text x="470" y="145" font-size="11" fill="#555450" font-family="Outfit, sans-serif">去聲 3+6 = 往下降</text>
+      <text x="470" y="180" font-size="11" fill="#555450" font-family="Outfit, sans-serif">入聲 7+8+9 = 截斷</text>
+    </svg>
+    <div style="font-size:11px;color:var(--text3)">陰調（1·2·3·7）音高偏高 · 陽調（4·5·6·9）音高偏低 · 中入（8）居中</div>
+  </div>
+
+  <div class="tone-grid">
+    <div class="tone-card" onclick="toggleTone(this)">
+      <div class="tc-num">調 1 · 陰平</div>
+      <div class="tc-cant">詩</div>
+      <div class="tc-jyut">si1</div>
+      <div class="tc-name">高平不動 ——</div>
+      <div class="tc-name" style="display:none;margin-top:6px;font-size:11px;color:var(--text2)">最高音區，保持不變。像唱歌時的長音。vs 陽平 4：起點差一個音區。</div>
+    </div>
+    <div class="tone-card" onclick="toggleTone(this)">
+      <div class="tc-num">調 2 · 陰上</div>
+      <div class="tc-cant">史</div>
+      <div class="tc-jyut">si2</div>
+      <div class="tc-name">中位往上升 ↗</div>
+      <div class="tc-name" style="display:none;margin-top:6px;font-size:11px;color:var(--text2)">從中位往高位升。vs 陽上 5：起點比 5 高，終點也高。</div>
+    </div>
+    <div class="tone-card" onclick="toggleTone(this)">
+      <div class="tc-num">調 3 · 陰去</div>
+      <div class="tc-cant">試</div>
+      <div class="tc-jyut">si3</div>
+      <div class="tc-name">高位緩降 ↘</div>
+      <div class="tc-name" style="display:none;margin-top:6px;font-size:11px;color:var(--text2)">從中高位緩慢下降。不是普通話四聲的急降，起點較低、降幅較小。</div>
+    </div>
+    <div class="tone-card" onclick="toggleTone(this)">
+      <div class="tc-num">調 4 · 陽平</div>
+      <div class="tc-cant">時</div>
+      <div class="tc-jyut">si4</div>
+      <div class="tc-name">低平不動 ——</div>
+      <div class="tc-name" style="display:none;margin-top:6px;font-size:11px;color:var(--text2)">最低音區，保持平穩。和陰平 1 形狀一樣，只是整體音高低一個音區。</div>
+    </div>
+    <div class="tone-card" onclick="toggleTone(this)">
+      <div class="tc-num">調 5 · 陽上</div>
+      <div class="tc-cant">市</div>
+      <div class="tc-jyut">si5</div>
+      <div class="tc-name">低位往上升 ↗</div>
+      <div class="tc-name" style="display:none;margin-top:6px;font-size:11px;color:var(--text2)">從低位往中位升。注意：不是普通話三聲的先降後升，是純升。</div>
+    </div>
+    <div class="tone-card" onclick="toggleTone(this)">
+      <div class="tc-num">調 6 · 陽去</div>
+      <div class="tc-cant">事</div>
+      <div class="tc-jyut">si6</div>
+      <div class="tc-name">低位往下降 ↘</div>
+      <div class="tc-name" style="display:none;margin-top:6px;font-size:11px;color:var(--text2)">從中低位往下降。vs 陰去 3：起點更低，整體在低音區。</div>
+    </div>
+    <div class="tone-card" onclick="toggleTone(this)" style="border-color:rgba(224,107,138,0.25)">
+      <div class="tc-num">調 7 · 陰入</div>
+      <div class="tc-cant">色</div>
+      <div class="tc-jyut">sik7</div>
+      <div class="tc-name">高 + 截斷 ⌐</div>
+      <div class="tc-name" style="display:none;margin-top:6px;font-size:11px;color:var(--text2)">高音區，以 -k/-p/-t 收尾，像被切斷一樣。入聲的關鍵是「截斷感」，不是音高。</div>
+    </div>
+    <div class="tone-card" onclick="toggleTone(this)" style="border-color:rgba(224,107,138,0.2)">
+      <div class="tc-num">調 8 · 中入</div>
+      <div class="tc-cant">錫</div>
+      <div class="tc-jyut">sik8</div>
+      <div class="tc-name">中 + 截斷 ⌐</div>
+      <div class="tc-name" style="display:none;margin-top:6px;font-size:11px;color:var(--text2)">中音區截斷。三個入聲的差異細微，先練出「截斷感」再分高中低。</div>
+    </div>
+    <div class="tone-card" onclick="toggleTone(this)" style="border-color:rgba(224,107,138,0.15)">
+      <div class="tc-num">調 9 · 陽入</div>
+      <div class="tc-cant">食</div>
+      <div class="tc-jyut">sik9</div>
+      <div class="tc-name">低 + 截斷 ⌐</div>
+      <div class="tc-name" style="display:none;margin-top:6px;font-size:11px;color:var(--text2)">低音區截斷。「食 sik9」是最常見的陽入字，Anki 第二天就會遇到。</div>
+    </div>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div id="panel-quiz" class="panel">
+  <div class="page-title">聲調練習</div>
+  <div class="page-sub">分組辨別練習 · 先選週次，再開始測驗</div>
+
+  <div class="vocab-filters" id="quiz-week-filters">
+    <button class="filter-btn active" onclick="setQuizWeek('w12',this)">週 1–2：平調</button>
+    <button class="filter-btn" onclick="setQuizWeek('w34',this)">週 3–4：升調</button>
+    <button class="filter-btn" onclick="setQuizWeek('w56',this)">週 5–6：降調+入聲</button>
+    <button class="filter-btn" onclick="setQuizWeek('w78',this)">週 7–8：混合 9 調</button>
+  </div>
+
+  <div class="voice-notice" id="voice-notice">⚠ 未偵測到粵語語音，播放的是普通話發音，僅供參考音調走向。建議搭配 Forvo 聆聽母語者錄音。</div>
+
+  <div class="quiz-area" id="quiz-area">
+    <button class="quiz-speak" id="quiz-speak-btn" onclick="speakQuiz(event)" title="播放發音">▶</button>
+    <div class="quiz-word" id="quiz-word">詩</div>
+    <div class="quiz-hint" id="quiz-hint">這個字是哪個聲調？</div>
+    <div class="quiz-jyut" id="quiz-jyut"></div>
+    <div class="quiz-result" id="quiz-result"></div>
+  </div>
+
+  <div class="choice-grid" id="choice-grid"></div>
+
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+    <div class="score-row">
+      <div class="score-stat"><div class="score-num" id="score-correct">0</div><div class="score-label">答對</div></div>
+      <div style="color:var(--text3);font-size:20px;padding:0 8px">/</div>
+      <div class="score-stat"><div class="score-num" id="score-total">0</div><div class="score-label">總題數</div></div>
+      <div style="color:var(--text3);font-size:20px;padding:0 8px">·</div>
+      <div class="score-stat"><div class="score-num" id="score-pct">—</div><div class="score-label">準確率</div></div>
+    </div>
+    <button class="btn btn-primary" onclick="nextQuestion()">下一題 →</button>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:var(--text2);background:var(--surface2);border-radius:var(--radius-sm);padding:8px 12px">
+    <span style="color:var(--text3)">最難聲調：</span>
+    <span id="worst-tone" style="font-weight:500;color:var(--pink)">—</span>
+    <span style="margin-left:auto;color:var(--text3);font-size:11px">累計紀錄，關閉網頁不消失</span>
+  </div>
+</div>
+
+<!-- VOCAB -->
+<div id="panel-vocab" class="panel">
+  <div class="page-title">詞卡瀏覽</div>
+  <div class="page-sub">點擊卡片翻面 → 標記已複習 · 進度自動儲存</div>
+
+  <div class="vocab-progress-bar">
+    <div class="vp-header">
+      <span class="vp-title">整體進度</span>
+      <span class="vp-count" id="vp-total-count">0 / 560</span>
+    </div>
+    <div class="vp-track"><div class="vp-fill" id="vp-total-fill" style="width:0%"></div></div>
+  </div>
+
+  <div class="day-progress-grid" id="day-progress-grid"></div>
+
+  <div class="vocab-filters" id="vocab-day-filters">
+    <button class="filter-btn active" onclick="filterVocabBy('all',this)">全部</button>
+    <button class="filter-btn" onclick="filterVocabBy('w1',this)">第 1 週</button>
+    <button class="filter-btn" onclick="filterVocabBy('w2',this)">第 2 週</button>
+    <button class="filter-btn" onclick="filterVocabBy('w3',this)">第 3 週</button>
+    <button class="filter-btn" onclick="filterVocabBy('w4',this)">第 4 週</button>
+    <button class="filter-btn" onclick="filterVocabBy('w5',this)">第 5 週</button>
+    <button class="filter-btn" onclick="filterVocabBy('w6',this)">第 6 週</button>
+    <button class="filter-btn" onclick="filterVocabBy('w7',this)">第 7 週</button>
+    <button class="filter-btn" onclick="filterVocabBy('w8',this)">第 8 週</button>
+  </div>
+  <div class="vocab-grid" id="vocab-grid"></div>
+</div>
+
+<!-- RULES -->
+<div id="panel-rules" class="panel">
+  <div class="page-title">學習原則</div>
+  <div class="page-sub">這個計劃的核心邏輯 · 理解原則有助於遇到瓶頸時不放棄</div>
+
+  <div class="card">
+    <div class="card-title">為什麼順序這麼重要</div>
+    <div class="rule-item"><div class="rule-dot" style="background:var(--amber)"></div><div class="rule-body"><b>聲調優先於詞彙。</b>粵語的 9 個聲調是你的大腦從未處理過的感知模式。在感知地圖建好之前輸入的任何內容，大腦都會用錯誤的方式解碼，形成難以糾正的壞習慣。</div></div>
+    <div class="rule-item"><div class="rule-dot" style="background:var(--teal)"></div><div class="rule-body"><b>分組再混合。</b>不要一開始就練全部 9 調。先建立「陰 vs 陽」的感知邊界，入聲單獨處理，最後才混合測試。跳過這個順序的學習者，八週後還是混淆。</div></div>
+    <div class="rule-item"><div class="rule-dot" style="background:var(--blue)"></div><div class="rule-body"><b>聽辨先於開口。</b>在聲調沒有穩定感知之前開口說話，只會把錯誤的音高模式肌肉化。耳朵建好感知地圖，嘴巴才能準確複製。</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">每天練習的核心規則</div>
+    <div class="rule-item"><div class="rule-dot" style="background:var(--green)"></div><div class="rule-body"><b>每天做，不求多。</b>間隔重複的效果建立在規律性上。跳過一天比縮短到 20 分鐘傷害更大——跳過一天會打斷 Anki 的複習週期，讓積累的記憶痕跡衰退。</div></div>
+    <div class="rule-item"><div class="rule-dot" style="background:var(--amber)"></div><div class="rule-body"><b>睡前練習最有效。</b>睡眠前的記憶在慢波睡眠期間自動鞏固。大腦在慢波睡眠期間優先處理「未解決的問題」，所以睡前記錄下今天的錯誤聲調對，鞏固效果最大。</div></div>
+    <div class="rule-item"><div class="rule-dot" style="background:var(--pink)"></div><div class="rule-body"><b>無聊感是正常的。</b>前八週沒有「學會說話」的成就感，底層能力建立期就是這樣。這種無聊感是信號，不是問題——它代表你在做正確但枯燥的基礎工作。</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">中文母語者的特定注意事項</div>
+    <div class="rule-item"><div class="rule-dot" style="background:var(--blue)"></div><div class="rule-body"><b>漢字是優勢，但聲調不會自動轉移。</b>你認識漢字，詞義不需要額外學習。但粵語聲調和普通話聲調是完全不同的感知系統，不能套用。</div></div>
+    <div class="rule-item"><div class="rule-dot" style="background:var(--pink)"></div><div class="rule-body"><b>陽上 5 是最大的陷阱。</b>普通話三聲是先降後升，但粵語陽上 5 是純升。台灣人最容易把 5 調誤判為「類似三聲」，需要刻意建立新的感知類別。</div></div>
+    <div class="rule-item"><div class="rule-dot" style="background:var(--teal)"></div><div class="rule-body"><b>陰去 3 不是普通話四聲。</b>兩者都往下降，但陰去 3 起點較低、降幅較小、速度較緩。不要用「往下降的感覺就是 3 調」這個捷徑——在正常語速裡這幾乎必然失敗。</div></div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<script>
+// Navigation
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// Tone cards
+function toggleTone(card) {
+  card.classList.toggle('selected');
+  const extra = card.querySelectorAll('.tc-name');
+  if (card.classList.contains('selected')) {
+    extra[1].style.display = 'block';
+  } else {
+    extra[1].style.display = 'none';
+  }
+}
+
+// Quiz data
+const quizData = {
+  w12: [
+    {char:'詩',jyut:'si1',tone:1,name:'陰平'},{char:'時',jyut:'si4',tone:4,name:'陽平'},
+    {char:'夫',jyut:'fu1',tone:1,name:'陰平'},{char:'扶',jyut:'fu4',tone:4,name:'陽平'},
+    {char:'花',jyut:'faa1',tone:1,name:'陰平'},{char:'家',jyut:'gaa1',tone:1,name:'陰平'},
+    {char:'茶',jyut:'caa4',tone:4,name:'陽平'},{char:'爸',jyut:'baa4',tone:4,name:'陽平'},
+    {char:'飛',jyut:'fei1',tone:1,name:'陰平'},{char:'肥',jyut:'fei4',tone:4,name:'陽平'},
+  ],
+  w34: [
+    {char:'史',jyut:'si2',tone:2,name:'陰上'},{char:'市',jyut:'si5',tone:5,name:'陽上'},
+    {char:'火',jyut:'fo2',tone:2,name:'陰上'},{char:'我',jyut:'ngo5',tone:5,name:'陽上'},
+    {char:'好',jyut:'hou2',tone:2,name:'陰上'},{char:'厚',jyut:'hau5',tone:5,name:'陽上'},
+    {char:'買',jyut:'maai5',tone:5,name:'陽上'},{char:'苦',jyut:'fu2',tone:2,name:'陰上'},
+    {char:'有',jyut:'jau5',tone:5,name:'陽上'},{char:'走',jyut:'zau2',tone:2,name:'陰上'},
+  ],
+  w56: [
+    {char:'試',jyut:'si3',tone:3,name:'陰去'},{char:'事',jyut:'si6',tone:6,name:'陽去'},
+    {char:'去',jyut:'heoi3',tone:3,name:'陰去'},{char:'字',jyut:'zi6',tone:6,name:'陽去'},
+    {char:'色',jyut:'sik7',tone:7,name:'陰入'},{char:'食',jyut:'sik9',tone:9,name:'陽入'},
+    {char:'意',jyut:'ji3',tone:3,name:'陰去'},{char:'易',jyut:'ji6',tone:6,name:'陽去'},
+    {char:'一',jyut:'jat7',tone:7,name:'陰入'},{char:'日',jyut:'jat9',tone:9,name:'陽入'},
+  ],
+  w78: [
+    {char:'詩',jyut:'si1',tone:1,name:'陰平'},{char:'史',jyut:'si2',tone:2,name:'陰上'},
+    {char:'試',jyut:'si3',tone:3,name:'陰去'},{char:'時',jyut:'si4',tone:4,name:'陽平'},
+    {char:'市',jyut:'si5',tone:5,name:'陽上'},{char:'事',jyut:'si6',tone:6,name:'陽去'},
+    {char:'色',jyut:'sik7',tone:7,name:'陰入'},{char:'錫',jyut:'sik8',tone:8,name:'中入'},
+    {char:'食',jyut:'sik9',tone:9,name:'陽入'},{char:'好',jyut:'hou2',tone:2,name:'陰上'},
+    {char:'有',jyut:'jau5',tone:5,name:'陽上'},{char:'去',jyut:'heoi3',tone:3,name:'陰去'},
+  ],
+};
+
+const choicesByWeek = {
+  w12: [{tone:1,name:'陰平 1'},{tone:4,name:'陽平 4'}],
+  w34: [{tone:2,name:'陰上 2'},{tone:5,name:'陽上 5'}],
+  w56: [{tone:3,name:'陰去 3'},{tone:6,name:'陽去 6'},{tone:7,name:'陰入 7'},{tone:8,name:'中入 8'},{tone:9,name:'陽入 9'}],
+  w78: [{tone:1,name:'1 陰平'},{tone:2,name:'2 陰上'},{tone:3,name:'3 陰去'},{tone:4,name:'4 陽平'},{tone:5,name:'5 陽上'},{tone:6,name:'6 陽去'},{tone:7,name:'7 陰入'},{tone:8,name:'8 中入'},{tone:9,name:'9 陽入'}],
+};
+
+let currentWeek = 'w12';
+let currentQ = null;
+let answered = false;
+let scoreCorrect = 0, scoreTotal = 0;
+
+function setQuizWeek(w, btn) {
+  currentWeek = w;
+  document.querySelectorAll('#quiz-week-filters .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  scoreCorrect = 0; scoreTotal = 0;
+  updateScore();
+  nextQuestion();
+}
+
+function buildChoices() {
+  const grid = document.getElementById('choice-grid');
+  grid.innerHTML = '';
+  const choices = choicesByWeek[currentWeek];
+  choices.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = c.name;
+    btn.onclick = () => answer(c.tone, btn);
+    grid.appendChild(btn);
+  });
+}
+
+function nextQuestion() {
+  const pool = quizData[currentWeek];
+  currentQ = pool[Math.floor(Math.random() * pool.length)];
+  answered = false;
+  document.getElementById('quiz-word').textContent = currentQ.char;
+  document.getElementById('quiz-hint').textContent = '這個字是哪個聲調？';
+  document.getElementById('quiz-jyut').style.display = 'none';
+  document.getElementById('quiz-result').textContent = '';
+  document.getElementById('quiz-result').className = 'quiz-result';
+  document.querySelectorAll('.choice-btn').forEach(b => { b.classList.remove('correct','wrong'); b.disabled = false; });
+}
+
+function answer(tone, btn) {
+  if (answered) return;
+  answered = true;
+  const isCorrect = tone === currentQ.tone;
+  document.getElementById('quiz-jyut').textContent = currentQ.jyut;
+  document.getElementById('quiz-jyut').style.display = 'block';
+  document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+  if (isCorrect) {
+    btn.classList.add('correct');
+    document.getElementById('quiz-result').textContent = '正確！' + currentQ.jyut + ' = ' + currentQ.name;
+    document.getElementById('quiz-result').className = 'quiz-result correct';
+  } else {
+    btn.classList.add('wrong');
+    document.getElementById('quiz-result').textContent = '答錯 — 正確是 ' + currentQ.name + '（' + currentQ.jyut + '）';
+    document.getElementById('quiz-result').className = 'quiz-result wrong';
+  }
+  recordQuizAnswer(currentQ.tone, isCorrect);
+}
+
+function updateScore() {
+  // driven by renderQuizStats() now
+}
+
+// Vocab
+const vocabData = [
+  // ── Day 1-7 (Week 1) ──────────────────────────────────────
+  {day:'d1',char:'唔該',jyut:'m4 goi1',tone:4,zh:'謝謝／麻煩你',hint:'最常用的感謝語'},
+  {day:'d1',char:'係',jyut:'hai6',tone:6,zh:'是',hint:'陽去聲'},
+  {day:'d1',char:'唔係',jyut:'m4 hai6',tone:4,zh:'不是',hint:'唔 永遠是陽平 4'},
+  {day:'d1',char:'我',jyut:'ngo5',tone:5,zh:'我',hint:'陽上 5'},
+  {day:'d1',char:'你',jyut:'nei5',tone:5,zh:'你',hint:'陽上 5，和「我」同調'},
+  {day:'d1',char:'佢',jyut:'keoi5',tone:5,zh:'他／她',hint:'粵語無性別之分'},
+  {day:'d1',char:'好',jyut:'hou2',tone:2,zh:'好',hint:'陰上 2'},
+  {day:'d1',char:'唔好',jyut:'m4 hou2',tone:4,zh:'不好／別',hint:'陽平接陰上'},
+  {day:'d1',char:'係咪',jyut:'hai6 mai6',tone:6,zh:'是嗎？',hint:'兩個陽去 6'},
+  {day:'d1',char:'幾好',jyut:'gei2 hou2',tone:2,zh:'挺好的',hint:'兩個陰上 2'},
+  {day:'d2',char:'有',jyut:'jau5',tone:5,zh:'有',hint:'陽上 5'},
+  {day:'d2',char:'冇',jyut:'mou5',tone:5,zh:'沒有',hint:'粵語特有字'},
+  {day:'d2',char:'想',jyut:'soeng2',tone:2,zh:'想要',hint:'陰上 2'},
+  {day:'d2',char:'去',jyut:'heoi3',tone:3,zh:'去',hint:'陰去 3'},
+  {day:'d2',char:'食',jyut:'sik6',tone:6,zh:'吃',hint:'入聲字，短促收尾'},
+  {day:'d2',char:'買',jyut:'maai5',tone:5,zh:'買',hint:'陽上 5'},
+  {day:'d2',char:'賣',jyut:'maai6',tone:6,zh:'賣',hint:'買5 vs 賣6 最佳對比'},
+  {day:'d2',char:'錢',jyut:'cin2',tone:2,zh:'錢',hint:'陰上 2'},
+  {day:'d2',char:'飲',jyut:'jam2',tone:2,zh:'喝',hint:'陰上 2，m 收尾'},
+  {day:'d2',char:'嚟',jyut:'lai4',tone:4,zh:'來',hint:'陽平 4'},
+  {day:'d3',char:'幾多',jyut:'gei2 do1',tone:2,zh:'多少',hint:'問數量固定搭配'},
+  {day:'d3',char:'幾多錢',jyut:'gei2 do1 cin2',tone:2,zh:'多少錢',hint:'聲調序列 2-1-2'},
+  {day:'d3',char:'呢個',jyut:'ni1 go3',tone:1,zh:'這個',hint:'陰平接陰去'},
+  {day:'d3',char:'嗰個',jyut:'go2 go3',tone:2,zh:'那個',hint:'兩個 go 聲調不同'},
+  {day:'d3',char:'喺',jyut:'hai2',tone:2,zh:'在（地點）',hint:'vs 係 hai6 聲調不同'},
+  {day:'d3',char:'邊度',jyut:'bin1 dou6',tone:1,zh:'哪裡',hint:'問地點固定搭配'},
+  {day:'d3',char:'而家',jyut:'ji4 gaa1',tone:4,zh:'現在',hint:'陽平接陰平'},
+  {day:'d3',char:'啱啱',jyut:'ngaam1 ngaam1',tone:1,zh:'剛剛',hint:'疊字，兩個陰平'},
+  {day:'d3',char:'啲',jyut:'di1',tone:1,zh:'一些',hint:'粵語高頻虛詞'},
+  {day:'d3',char:'咁',jyut:'gam3',tone:3,zh:'這樣／那麼',hint:'陰去 3'},
+  {day:'d4',char:'唔明',jyut:'m4 ming4',tone:4,zh:'不明白',hint:'兩個陽平 4'},
+  {day:'d4',char:'講',jyut:'gong2',tone:2,zh:'說',hint:'陰上 2'},
+  {day:'d4',char:'聽',jyut:'teng1',tone:1,zh:'聽',hint:'陰平 1，ng 收尾'},
+  {day:'d4',char:'睇',jyut:'tai2',tone:2,zh:'看',hint:'陰上 2'},
+  {day:'d4',char:'知',jyut:'zi1',tone:1,zh:'知道',hint:'陰平 1'},
+  {day:'d4',char:'唔知',jyut:'m4 zi1',tone:4,zh:'不知道',hint:'陽平接陰平'},
+  {day:'d4',char:'記得',jyut:'gei3 dak1',tone:3,zh:'記得',hint:'陰去接陰入'},
+  {day:'d4',char:'係噉',jyut:'hai6 gam2',tone:6,zh:'就是這樣',hint:'句尾確認語氣'},
+  {day:'d4',char:'唔識',jyut:'m4 sik1',tone:4,zh:'不會',hint:'識 陰平入聲'},
+  {day:'d4',char:'唔記得',jyut:'m4 gei3 dak1',tone:4,zh:'忘記了',hint:'三字聲調序列 4-3-1'},
+  {day:'d5',char:'早晨',jyut:'zou2 san4',tone:2,zh:'早上好',hint:'陰上接陽平'},
+  {day:'d5',char:'拜拜',jyut:'baai1 baai3',tone:1,zh:'再見',hint:'陰平接陰去，兩字不同'},
+  {day:'d5',char:'多謝',jyut:'do1 ze6',tone:1,zh:'謝謝（收禮物）',hint:'與唔該分工'},
+  {day:'d5',char:'唔緊要',jyut:'m4 gan2 jiu3',tone:4,zh:'沒關係',hint:'聲調序列 4-2-3'},
+  {day:'d5',char:'係喎',jyut:'hai6 wo3',tone:6,zh:'是呢／對喔',hint:'語氣詞喎'},
+  {day:'d5',char:'點解',jyut:'dim2 gaai2',tone:2,zh:'為什麼',hint:'兩個陰上 2'},
+  {day:'d5',char:'點樣',jyut:'dim2 joeng2',tone:2,zh:'怎樣',hint:'兩個陰上 2'},
+  {day:'d5',char:'梗係',jyut:'gang2 hai6',tone:2,zh:'當然是',hint:'陰上接陽去'},
+  {day:'d5',char:'真係',jyut:'zan1 hai6',tone:1,zh:'真的是',hint:'強調用語'},
+  {day:'d5',char:'即係',jyut:'zik1 hai6',tone:7,zh:'即是說',hint:'入聲字 zik1'},
+  {day:'d6',char:'食嘢',jyut:'sik6 je5',tone:6,zh:'吃東西',hint:'入聲接陽上'},
+  {day:'d6',char:'好食',jyut:'hou2 sik6',tone:2,zh:'好吃',hint:'入聲字結尾'},
+  {day:'d6',char:'熱',jyut:'jit6',tone:6,zh:'熱',hint:'入聲字'},
+  {day:'d6',char:'凍',jyut:'dung3',tone:3,zh:'冷',hint:'陰去 3'},
+  {day:'d6',char:'貴',jyut:'gwai3',tone:3,zh:'貴',hint:'陰去 3'},
+  {day:'d6',char:'平',jyut:'peng4',tone:4,zh:'便宜',hint:'陽平 4'},
+  {day:'d6',char:'大',jyut:'daai6',tone:6,zh:'大',hint:'陽去 6'},
+  {day:'d6',char:'細',jyut:'sai3',tone:3,zh:'小',hint:'陰去 3'},
+  {day:'d6',char:'飲嘢',jyut:'jam2 je5',tone:2,zh:'喝東西',hint:'陰上接陽上'},
+  {day:'d6',char:'唔好食',jyut:'m4 hou2 sik6',tone:4,zh:'難吃',hint:'聲調序列 4-2-6'},
+  {day:'d7',char:'係度',jyut:'hai2 dou6',tone:2,zh:'在這裡',hint:'陰上接陽去'},
+  {day:'d7',char:'去邊',jyut:'heoi3 bin1',tone:3,zh:'去哪裡',hint:'陰去接陰平'},
+  {day:'d7',char:'幾時',jyut:'gei2 si4',tone:2,zh:'什麼時候',hint:'問時間'},
+  {day:'d7',char:'尋日',jyut:'cam4 jat6',tone:4,zh:'昨天',hint:'入聲字結尾'},
+  {day:'d7',char:'聽日',jyut:'ting1 jat6',tone:1,zh:'明天',hint:'陰平接陽去入'},
+  {day:'d7',char:'而且',jyut:'ji4 ce2',tone:4,zh:'而且',hint:'連接詞'},
+  {day:'d7',char:'但係',jyut:'daan6 hai6',tone:6,zh:'但是',hint:'兩個陽去 6'},
+  {day:'d7',char:'所以',jyut:'so2 ji5',tone:2,zh:'所以',hint:'陰上接陽上'},
+  {day:'d7',char:'如果',jyut:'jyu4 gwo2',tone:4,zh:'如果',hint:'陽平接陰上'},
+  {day:'d7',char:'依家',jyut:'ji4 gaa1',tone:4,zh:'現在（口語）',hint:'和「而家」同義'},
+  // ── Day 8-14 (Week 2) ─────────────────────────────────────
+  {day:'d8',char:'屋企',jyut:'uk1 kei2',tone:1,zh:'家',hint:'陰平接陰上，粵語「家」'},
+  {day:'d8',char:'返屋企',jyut:'faan1 uk1 kei2',tone:1,zh:'回家',hint:'三字聲調 1-1-2'},
+  {day:'d8',char:'出街',jyut:'ceot1 gaai1',tone:1,zh:'出門／上街',hint:'兩個陰平 1'},
+  {day:'d8',char:'搭車',jyut:'daap3 ce1',tone:3,zh:'搭車',hint:'陰去接陰平'},
+  {day:'d8',char:'落車',jyut:'lok6 ce1',tone:6,zh:'下車',hint:'陽去接陰平'},
+  {day:'d8',char:'係咁',jyut:'hai6 gam3',tone:6,zh:'就是這樣了',hint:'陽去接陰去'},
+  {day:'d8',char:'攞',jyut:'lo2',tone:2,zh:'拿取',hint:'陰上 2，常用動詞'},
+  {day:'d8',char:'畀',jyut:'bei2',tone:2,zh:'給',hint:'陰上 2，給予'},
+  {day:'d8',char:'執',jyut:'zap1',tone:7,zh:'執／收拾',hint:'陰入 7，短促'},
+  {day:'d8',char:'搞',jyut:'gaau2',tone:2,zh:'搞定／處理',hint:'陰上 2'},
+  {day:'d9',char:'係唔係',jyut:'hai6 m4 hai6',tone:6,zh:'是不是',hint:'三字聲調 6-4-6'},
+  {day:'d9',char:'有冇',jyut:'jau5 mou5',tone:5,zh:'有沒有',hint:'兩個陽上 5'},
+  {day:'d9',char:'要唔要',jyut:'jiu3 m4 jiu3',tone:3,zh:'要不要',hint:'三字聲調 3-4-3'},
+  {day:'d9',char:'得唔得',jyut:'dak1 m4 dak1',tone:7,zh:'可不可以',hint:'入聲包夾陽平'},
+  {day:'d9',char:'係咁㗎',jyut:'hai6 gam3 ga3',tone:6,zh:'本來就是這樣',hint:'語氣詞㗎，陰去 3'},
+  {day:'d9',char:'冇問題',jyut:'mou5 man6 tai4',tone:5,zh:'沒問題',hint:'陽上-陽去-陽平'},
+  {day:'d9',char:'唔該晒',jyut:'m4 goi1 saai3',tone:4,zh:'非常感謝',hint:'唔該的加強版'},
+  {day:'d9',char:'好耐',jyut:'hou2 noi6',tone:2,zh:'很久',hint:'陰上接陽去'},
+  {day:'d9',char:'啱先',jyut:'ngaam1 sin1',tone:1,zh:'剛才',hint:'兩個陰平 1'},
+  {day:'d9',char:'而且',jyut:'ji4 ce2',tone:4,zh:'而且',hint:'陽平接陰上'},
+  {day:'d10',char:'食飯',jyut:'sik6 faan6',tone:6,zh:'吃飯',hint:'兩個陽去，都是入聲/去聲'},
+  {day:'d10',char:'飲茶',jyut:'jam2 caa4',tone:2,zh:'飲茶（粵式早午餐）',hint:'陰上接陽平'},
+  {day:'d10',char:'點菜',jyut:'dim2 coi3',tone:2,zh:'點餐',hint:'陰上接陰去'},
+  {day:'d10',char:'埋單',jyut:'maai4 daan1',tone:4,zh:'結帳',hint:'陽平接陰平'},
+  {day:'d10',char:'打包',jyut:'daa2 baau1',tone:2,zh:'打包外帶',hint:'陰上接陰平'},
+  {day:'d10',char:'堂食',jyut:'tong4 sik6',tone:4,zh:'內用',hint:'陽平接陽去入'},
+  {day:'d10',char:'走冰',jyut:'zau2 bing1',tone:2,zh:'去冰',hint:'陰上接陰平'},
+  {day:'d10',char:'少甜',jyut:'siu2 tim4',tone:2,zh:'少糖',hint:'陰上接陽平'},
+  {day:'d10',char:'加辣',jyut:'gaa1 laat6',tone:1,zh:'加辣',hint:'陰平接陽去入'},
+  {day:'d10',char:'唔辣',jyut:'m4 laat6',tone:4,zh:'不辣',hint:'陽平接陽去入'},
+  {day:'d11',char:'幾點',jyut:'gei2 dim2',tone:2,zh:'幾點鐘',hint:'兩個陰上 2'},
+  {day:'d11',char:'幾點鐘',jyut:'gei2 dim2 zung1',tone:2,zh:'幾點鐘（完整說法）',hint:'三字全陰調'},
+  {day:'d11',char:'而家幾點',jyut:'ji4 gaa1 gei2 dim2',tone:4,zh:'現在幾點',hint:'陽平+陰平+陰上+陰上'},
+  {day:'d11',char:'朝早',jyut:'ziu1 zou2',tone:1,zh:'早上',hint:'陰平接陰上'},
+  {day:'d11',char:'下晝',jyut:'haa6 zau3',tone:6,zh:'下午',hint:'陽去接陰去'},
+  {day:'d11',char:'夜晚',jyut:'je6 maan5',tone:6,zh:'晚上',hint:'陽去接陽上'},
+  {day:'d11',char:'今日',jyut:'gam1 jat6',tone:1,zh:'今天',hint:'陰平接陽去入'},
+  {day:'d11',char:'琴日',jyut:'kam4 jat6',tone:4,zh:'昨天（口語）',hint:'陽平接陽去入'},
+  {day:'d11',char:'聽日',jyut:'ting1 jat6',tone:1,zh:'明天',hint:'陰平接陽去入'},
+  {day:'d11',char:'後日',jyut:'hau6 jat6',tone:6,zh:'後天',hint:'陽去接陽去入'},
+  {day:'d12',char:'好靚',jyut:'hou2 leng3',tone:2,zh:'很漂亮',hint:'陰上接陰去'},
+  {day:'d12',char:'好型',jyut:'hou2 jing4',tone:2,zh:'很帥氣',hint:'陰上接陽平'},
+  {day:'d12',char:'好正',jyut:'hou2 zeng3',tone:2,zh:'很棒',hint:'口語讚美，陰上接陰去'},
+  {day:'d12',char:'好勁',jyut:'hou2 ging6',tone:2,zh:'很厲害',hint:'陰上接陽去'},
+  {day:'d12',char:'好煩',jyut:'hou2 faan4',tone:2,zh:'很煩',hint:'陰上接陽平'},
+  {day:'d12',char:'好攰',jyut:'hou2 gwui6',tone:2,zh:'很累',hint:'陰上接陽去'},
+  {day:'d12',char:'好忙',jyut:'hou2 mong4',tone:2,zh:'很忙',hint:'陰上接陽平'},
+  {day:'d12',char:'好凍',jyut:'hou2 dung3',tone:2,zh:'很冷',hint:'陰上接陰去'},
+  {day:'d12',char:'好熱',jyut:'hou2 jit6',tone:2,zh:'很熱',hint:'陰上接陽去入'},
+  {day:'d12',char:'好開心',jyut:'hou2 hoi1 sam1',tone:2,zh:'很開心',hint:'三字，陰上+陰平+陰平'},
+  {day:'d13',char:'去邊度',jyut:'heoi3 bin1 dou6',tone:3,zh:'去哪裡',hint:'三字聲調 3-1-6'},
+  {day:'d13',char:'喺邊度',jyut:'hai2 bin1 dou6',tone:2,zh:'在哪裡',hint:'三字聲調 2-1-6'},
+  {day:'d13',char:'點去',jyut:'dim2 heoi3',tone:2,zh:'怎麼去',hint:'陰上接陰去'},
+  {day:'d13',char:'行路',jyut:'haang4 lou6',tone:4,zh:'走路',hint:'陽平接陽去'},
+  {day:'d13',char:'搭地鐵',jyut:'daap3 dei6 tit3',tone:3,zh:'搭地鐵',hint:'三字，陰去+陽去+陰去'},
+  {day:'d13',char:'搭巴士',jyut:'daap3 baa1 si2',tone:3,zh:'搭巴士',hint:'三字，陰去+陰平+陰上'},
+  {day:'d13',char:'附近',jyut:'fu6 gan6',tone:6,zh:'附近',hint:'兩個陽去 6'},
+  {day:'d13',char:'直行',jyut:'zik6 haang4',tone:6,zh:'直走',hint:'陽去接陽平'},
+  {day:'d13',char:'轉左',jyut:'zyun3 zo2',tone:3,zh:'左轉',hint:'陰去接陰上'},
+  {day:'d13',char:'轉右',jyut:'zyun3 jau6',tone:3,zh:'右轉',hint:'陰去接陽去'},
+  {day:'d14',char:'工作',jyut:'gung1 zok3',tone:1,zh:'工作',hint:'陰平接陰去'},
+  {day:'d14',char:'開會',jyut:'hoi1 wui2',tone:1,zh:'開會',hint:'陰平接陰上'},
+  {day:'d14',char:'傾偈',jyut:'king1 gai2',tone:1,zh:'聊天',hint:'口語，陰平接陰上'},
+  {day:'d14',char:'搞掂',jyut:'gaau2 dim6',tone:2,zh:'搞定了',hint:'陰上接陽去'},
+  {day:'d14',char:'幫手',jyut:'bong1 sau2',tone:1,zh:'幫忙',hint:'陰平接陰上'},
+  {day:'d14',char:'跟進',jyut:'gan1 zeon3',tone:1,zh:'跟進',hint:'陰平接陰去'},
+  {day:'d14',char:'幾時得閒',jyut:'gei2 si4 dak1 haan4',tone:2,zh:'什麼時候有空',hint:'四字，商務常用'},
+  {day:'d14',char:'下次再講',jyut:'haa6 ci3 zoi3 gong2',tone:6,zh:'下次再說',hint:'四字，陽去+陰去+再+陰上'},
+  {day:'d14',char:'唔該你',jyut:'m4 goi1 nei5',tone:4,zh:'麻煩你了',hint:'三字，有禮貌的請求'},
+  {day:'d14',char:'搞咗先',jyut:'gaau2 zo2 sin1',tone:2,zh:'先處理這個',hint:'粵語完成時態 咗'},
+  // ── Day 15-21 (Week 3) ────────────────────────────────────
+  {day:'d15',char:'你好',jyut:'nei5 hou2',tone:5,zh:'你好（正式）',hint:'陽上接陰上，比普通話少用'},
+  {day:'d15',char:'請問',jyut:'cing2 man6',tone:2,zh:'請問',hint:'陰上接陽去'},
+  {day:'d15',char:'你係邊位',jyut:'nei5 hai6 bin1 wai2',tone:5,zh:'你是哪位',hint:'商務常用，陽上+陽去+陰平+陰上'},
+  {day:'d15',char:'失陪',jyut:'sat1 pui4',tone:7,zh:'失陪（告辭）',hint:'入聲接陽平'},
+  {day:'d15',char:'唔好意思',jyut:'m4 hou2 ji3 si3',tone:4,zh:'不好意思',hint:'五字，陽平+陰上+陰去+陰去'},
+  {day:'d15',char:'麻煩晒',jyut:'maa4 faan4 saai3',tone:4,zh:'麻煩你了（感謝）',hint:'陽平+陽平+陰去'},
+  {day:'d15',char:'辛苦晒',jyut:'san1 fu2 saai3',tone:1,zh:'辛苦了',hint:'陰平+陰上+陰去'},
+  {day:'d15',char:'保重',jyut:'bou2 zung6',tone:2,zh:'保重',hint:'陰上接陽去'},
+  {day:'d15',char:'多多指教',jyut:'do1 do1 zi2 gaau3',tone:1,zh:'多多指教',hint:'四字，陰平+陰平+陰上+陰去'},
+  {day:'d15',char:'好耐冇見',jyut:'hou2 noi6 mou5 gin3',tone:2,zh:'好久不見',hint:'四字常用寒暄'},
+  {day:'d16',char:'邊個',jyut:'bin1 go3',tone:1,zh:'誰',hint:'陰平接陰去'},
+  {day:'d16',char:'乜嘢',jyut:'mat1 je5',tone:7,zh:'什麼',hint:'入聲接陽上'},
+  {day:'d16',char:'點解',jyut:'dim2 gaai2',tone:2,zh:'為什麼',hint:'兩個陰上 2'},
+  {day:'d16',char:'點做',jyut:'dim2 zou6',tone:2,zh:'怎麼做',hint:'陰上接陽去'},
+  {day:'d16',char:'幾時',jyut:'gei2 si4',tone:2,zh:'什麼時候',hint:'陰上接陽平'},
+  {day:'d16',char:'幾多',jyut:'gei2 do1',tone:2,zh:'多少',hint:'陰上接陰平'},
+  {day:'d16',char:'幾耐',jyut:'gei2 noi6',tone:2,zh:'多久',hint:'陰上接陽去'},
+  {day:'d16',char:'乜事',jyut:'mat1 si6',tone:7,zh:'什麼事',hint:'入聲接陽去'},
+  {day:'d16',char:'咩原因',jyut:'me1 jyun4 jan1',tone:1,zh:'什麼原因',hint:'三字問句'},
+  {day:'d16',char:'你話呢',jyut:'nei5 waa6 ne1',tone:5,zh:'你說呢／你覺得呢',hint:'徵詢意見'},
+  {day:'d17',char:'我唔係',jyut:'ngo5 m4 hai6',tone:5,zh:'我不是',hint:'否定句基本結構'},
+  {day:'d17',char:'我唔想',jyut:'ngo5 m4 soeng2',tone:5,zh:'我不想',hint:'陽上+陽平+陰上'},
+  {day:'d17',char:'我唔識',jyut:'ngo5 m4 sik1',tone:5,zh:'我不會',hint:'陽上+陽平+陰入'},
+  {day:'d17',char:'我唔知',jyut:'ngo5 m4 zi1',tone:5,zh:'我不知道',hint:'陽上+陽平+陰平'},
+  {day:'d17',char:'我未試過',jyut:'ngo5 mei6 si3 gwo3',tone:5,zh:'我沒試過',hint:'否定完成時'},
+  {day:'d17',char:'我試吓',jyut:'ngo5 si3 haa5',tone:5,zh:'我試試看',hint:'吓表示嘗試，陽上'},
+  {day:'d17',char:'我唔肯定',jyut:'ngo5 m4 hang2 ding6',tone:5,zh:'我不確定',hint:'四字，常用表達'},
+  {day:'d17',char:'我覺得',jyut:'ngo5 gok3 dak1',tone:5,zh:'我覺得',hint:'陽上+陰去+陰入'},
+  {day:'d17',char:'我認為',jyut:'ngo5 jing6 wai4',tone:5,zh:'我認為（正式）',hint:'商務場合'},
+  {day:'d17',char:'我建議',jyut:'ngo5 gin3 ji5',tone:5,zh:'我建議',hint:'陽上+陰去+陽上'},
+  {day:'d18',char:'呢樣嘢',jyut:'ni1 joeng6 je5',tone:1,zh:'這個東西',hint:'陰平+陽去+陽上'},
+  {day:'d18',char:'嗰樣嘢',jyut:'go2 joeng6 je5',tone:2,zh:'那個東西',hint:'陰上+陽去+陽上'},
+  {day:'d18',char:'呢度',jyut:'ni1 dou6',tone:1,zh:'這裡',hint:'陰平接陽去'},
+  {day:'d18',char:'嗰度',jyut:'go2 dou6',tone:2,zh:'那裡',hint:'陰上接陽去'},
+  {day:'d18',char:'呢次',jyut:'ni1 ci3',tone:1,zh:'這次',hint:'陰平接陰去'},
+  {day:'d18',char:'上次',jyut:'soeng6 ci3',tone:6,zh:'上次',hint:'陽去接陰去'},
+  {day:'d18',char:'下次',jyut:'haa6 ci3',tone:6,zh:'下次',hint:'陽去接陰去'},
+  {day:'d18',char:'每次',jyut:'mui5 ci3',tone:5,zh:'每次',hint:'陽上接陰去'},
+  {day:'d18',char:'第一次',jyut:'dai6 jat1 ci3',tone:6,zh:'第一次',hint:'三字，陽去+陰入+陰去'},
+  {day:'d18',char:'上個星期',jyut:'soeng6 go3 sing1 kei4',tone:6,zh:'上個星期',hint:'四字，上週'},
+  {day:'d19',char:'做嘢',jyut:'zou6 je5',tone:6,zh:'工作／做事',hint:'陽去接陽上'},
+  {day:'d19',char:'返工',jyut:'faan1 gung1',tone:1,zh:'上班',hint:'陰平接陰平'},
+  {day:'d19',char:'放工',jyut:'fong3 gung1',tone:3,zh:'下班',hint:'陰去接陰平'},
+  {day:'d19',char:'放假',jyut:'fong3 gaa3',tone:3,zh:'放假',hint:'陰去接陰去'},
+  {day:'d19',char:'開心',jyut:'hoi1 sam1',tone:1,zh:'開心',hint:'兩個陰平 1'},
+  {day:'d19',char:'唔開心',jyut:'m4 hoi1 sam1',tone:4,zh:'不開心',hint:'陽平+陰平+陰平'},
+  {day:'d19',char:'擔心',jyut:'daam1 sam1',tone:1,zh:'擔心',hint:'兩個陰平 1'},
+  {day:'d19',char:'緊張',jyut:'gan2 zoeng1',tone:2,zh:'緊張',hint:'陰上接陰平'},
+  {day:'d19',char:'放鬆',jyut:'fong3 sung1',tone:3,zh:'放鬆',hint:'陰去接陰平'},
+  {day:'d19',char:'驚',jyut:'geng1',tone:1,zh:'害怕',hint:'陰平，粵語常用'},
+  {day:'d20',char:'邊個嚟㗎',jyut:'bin1 go3 lai4 ga3',tone:1,zh:'是誰來的',hint:'常見口語句型'},
+  {day:'d20',char:'係咁㗎啦',jyut:'hai6 gam3 ga3 laa3',tone:6,zh:'就是這樣啦',hint:'語氣詞疊加'},
+  {day:'d20',char:'咁㗎咋',jyut:'gam3 ga3 zaa3',tone:3,zh:'就這樣而已',hint:'三個語氣詞'},
+  {day:'d20',char:'係喇',jyut:'hai6 laa3',tone:6,zh:'是的（確認）',hint:'陽去接陰去'},
+  {day:'d20',char:'唔係喇',jyut:'m4 hai6 laa3',tone:4,zh:'不是的',hint:'否定確認'},
+  {day:'d20',char:'真㗎',jyut:'zan1 ga3',tone:1,zh:'是真的',hint:'陰平接陰去'},
+  {day:'d20',char:'假㗎',jyut:'gaa2 ga3',tone:2,zh:'是假的',hint:'陰上接陰去'},
+  {day:'d20',char:'點解㗎',jyut:'dim2 gaai2 ga3',tone:2,zh:'為什麼呢',hint:'問原因加語氣'},
+  {day:'d20',char:'即管',jyut:'zik1 gun2',tone:7,zh:'盡管去做',hint:'鼓勵對方，入聲接陰上'},
+  {day:'d20',char:'無所謂',jyut:'mou4 so2 wai6',tone:4,zh:'無所謂',hint:'陽平+陰上+陽去'},
+  {day:'d21',char:'買嘢',jyut:'maai5 je5',tone:5,zh:'購物',hint:'兩個陽上 5'},
+  {day:'d21',char:'著衫',jyut:'zoek3 saam1',tone:3,zh:'穿衣服',hint:'陰去接陰平'},
+  {day:'d21',char:'換衫',jyut:'wun6 saam1',tone:6,zh:'換衣服',hint:'陽去接陰平'},
+  {day:'d21',char:'着鞋',jyut:'zoek3 haai4',tone:3,zh:'穿鞋',hint:'陰去接陽平'},
+  {day:'d21',char:'試身',jyut:'si3 san1',tone:3,zh:'試穿',hint:'陰去接陰平'},
+  {day:'d21',char:'啱著',jyut:'ngaam1 zoek3',tone:1,zh:'合適／剛好合穿',hint:'陰平接陰去'},
+  {day:'d21',char:'唔啱',jyut:'m4 ngaam1',tone:4,zh:'不合適',hint:'陽平接陰平'},
+  {day:'d21',char:'大碼',jyut:'daai6 maa5',tone:6,zh:'大號',hint:'陽去接陽上'},
+  {day:'d21',char:'細碼',jyut:'sai3 maa5',tone:3,zh:'小號',hint:'陰去接陽上'},
+  {day:'d21',char:'有無折扣',jyut:'jau5 mou5 zit3 kau3',tone:5,zh:'有沒有折扣',hint:'四字，陽上+陽上+陰去+陰去'},
+  // ── Day 22-28 (Week 4) ────────────────────────────────────
+  {day:'d22',char:'火',jyut:'fo2',tone:2,zh:'火',hint:'陰上 2，升調對比練習'},
+  {day:'d22',char:'河',jyut:'ho4',tone:4,zh:'河',hint:'陽平 4，升調對比練習'},
+  {day:'d22',char:'苦',jyut:'fu2',tone:2,zh:'苦',hint:'陰上 2'},
+  {day:'d22',char:'湖',jyut:'wu4',tone:4,zh:'湖',hint:'陽平 4'},
+  {day:'d22',char:'走',jyut:'zau2',tone:2,zh:'走／離開',hint:'陰上 2'},
+  {day:'d22',char:'酒',jyut:'zau2',tone:2,zh:'酒',hint:'走酒同音，陰上 2'},
+  {day:'d22',char:'舅',jyut:'kau5',tone:5,zh:'舅舅',hint:'陽上 5'},
+  {day:'d22',char:'厚',jyut:'hau5',tone:5,zh:'厚',hint:'陽上 5'},
+  {day:'d22',char:'口',jyut:'hau2',tone:2,zh:'口',hint:'陰上 2，vs 厚 5'},
+  {day:'d22',char:'舊',jyut:'gau6',tone:6,zh:'舊',hint:'陽去 6'},
+  {day:'d23',char:'短',jyut:'dyun2',tone:2,zh:'短',hint:'陰上 2'},
+  {day:'d23',char:'斷',jyut:'dyun6',tone:6,zh:'斷',hint:'陽去 6，短 vs 斷'},
+  {day:'d23',char:'遠',jyut:'jyun5',tone:5,zh:'遠',hint:'陽上 5'},
+  {day:'d23',char:'院',jyut:'jyun2',tone:2,zh:'醫院',hint:'陰上 2，遠 vs 院'},
+  {day:'d23',char:'近',jyut:'kan5',tone:5,zh:'近',hint:'陽上 5'},
+  {day:'d23',char:'勤',jyut:'kan4',tone:4,zh:'勤力',hint:'陽平 4，近 vs 勤'},
+  {day:'d23',char:'慢',jyut:'maan6',tone:6,zh:'慢',hint:'陽去 6'},
+  {day:'d23',char:'滿',jyut:'mun5',tone:5,zh:'滿',hint:'陽上 5，慢 vs 滿'},
+  {day:'d23',char:'快',jyut:'faai3',tone:3,zh:'快',hint:'陰去 3'},
+  {day:'d23',char:'壞',jyut:'waai6',tone:6,zh:'壞',hint:'陽去 6，快 vs 壞'},
+  {day:'d24',char:'病',jyut:'beng6',tone:6,zh:'生病',hint:'陽去 6'},
+  {day:'d24',char:'睇醫生',jyut:'tai2 ji1 sang1',tone:2,zh:'看醫生',hint:'三字，陰上+陰平+陰平'},
+  {day:'d24',char:'頭痛',jyut:'tau4 tung3',tone:4,zh:'頭痛',hint:'陽平接陰去'},
+  {day:'d24',char:'肚痛',jyut:'tou5 tung3',tone:5,zh:'肚子痛',hint:'陽上接陰去'},
+  {day:'d24',char:'發燒',jyut:'faat3 siu1',tone:3,zh:'發燒',hint:'入聲 faat3 接陰平'},
+  {day:'d24',char:'咳嗽',jyut:'kat1 sau3',tone:7,zh:'咳嗽',hint:'入聲接陰去'},
+  {day:'d24',char:'唔舒服',jyut:'m4 syu1 fuk6',tone:4,zh:'不舒服',hint:'陽平+陰平+陽去入'},
+  {day:'d24',char:'食藥',jyut:'sik6 joek6',tone:6,zh:'吃藥',hint:'兩個陽去入聲'},
+  {day:'d24',char:'休息',jyut:'jau1 sik1',tone:1,zh:'休息',hint:'陰平接陰入'},
+  {day:'d24',char:'好返',jyut:'hou2 faan1',tone:2,zh:'痊癒',hint:'陰上接陰平'},
+  {day:'d25',char:'錢包',jyut:'cin4 baau1',tone:4,zh:'錢包',hint:'陽平接陰平'},
+  {day:'d25',char:'手機',jyut:'sau2 gei1',tone:2,zh:'手機',hint:'陰上接陰平'},
+  {day:'d25',char:'充電',jyut:'cung1 din6',tone:1,zh:'充電',hint:'陰平接陽去'},
+  {day:'d25',char:'上網',jyut:'soeng5 mong5',tone:5,zh:'上網',hint:'兩個陽上 5'},
+  {day:'d25',char:'WiFi',jyut:'wai1 fai1',tone:1,zh:'無線網路',hint:'陰平接陰平'},
+  {day:'d25',char:'密碼',jyut:'mat6 maa5',tone:6,zh:'密碼',hint:'陽去入接陽上'},
+  {day:'d25',char:'傳送',jyut:'cyun4 sung3',tone:4,zh:'傳送',hint:'陽平接陰去'},
+  {day:'d25',char:'收到',jyut:'sau1 dou3',tone:1,zh:'收到了',hint:'陰平接陰去'},
+  {day:'d25',char:'冇訊號',jyut:'mou5 seon3 hou6',tone:5,zh:'沒有訊號',hint:'陽上+陰去+陽去'},
+  {day:'d25',char:'死機',jyut:'sei2 gei1',tone:2,zh:'當機',hint:'陰上接陰平'},
+  {day:'d26',char:'請坐',jyut:'cing2 co5',tone:2,zh:'請坐',hint:'陰上接陽上'},
+  {day:'d26',char:'請等一等',jyut:'cing2 dang2 jat1 dang2',tone:2,zh:'請稍等',hint:'禮貌等待'},
+  {day:'d26',char:'有咩可以幫到你',jyut:'jau5 me1 ho2 ji5 bong1 dou3 nei5',tone:5,zh:'有什麼可以幫你',hint:'商務標準問候'},
+  {day:'d26',char:'你好滿意嗎',jyut:'nei5 hou2 mun5 ji3 maa3',tone:5,zh:'你滿意嗎',hint:'服務業常用'},
+  {day:'d26',char:'多謝惠顧',jyut:'do1 ze6 wai6 gu3',tone:1,zh:'感謝光顧',hint:'商業用語'},
+  {day:'d26',char:'歡迎下次再嚟',jyut:'fun1 jing4 haa6 ci3 zoi3 lai4',tone:1,zh:'歡迎下次再來',hint:'服務業送客'},
+  {day:'d26',char:'你係咪預約咗',jyut:'nei5 hai6 mai6 jyu6 joek3 zo2',tone:5,zh:'你是否有預約',hint:'正式場合查詢'},
+  {day:'d26',char:'請問貴姓',jyut:'cing2 man6 gwai3 sing3',tone:2,zh:'請問尊姓',hint:'正式詢問姓氏'},
+  {day:'d26',char:'稍後通知你',jyut:'siu2 hau6 tung1 zi1 nei5',tone:2,zh:'稍後通知你',hint:'商務回覆'},
+  {day:'d26',char:'多謝配合',jyut:'do1 ze6 pui3 hap6',tone:1,zh:'感謝配合',hint:'正式感謝'},
+  {day:'d27',char:'數字一',jyut:'jat1',tone:7,zh:'一',hint:'陰入 7，短促'},
+  {day:'d27',char:'數字二',jyut:'ji6',tone:6,zh:'二',hint:'陽去 6'},
+  {day:'d27',char:'數字三',jyut:'saam1',tone:1,zh:'三',hint:'陰平 1'},
+  {day:'d27',char:'數字四',jyut:'sei3',tone:3,zh:'四',hint:'陰去 3'},
+  {day:'d27',char:'數字五',jyut:'ng5',tone:5,zh:'五',hint:'陽上 5'},
+  {day:'d27',char:'數字六',jyut:'luk6',tone:9,zh:'六',hint:'陽入 9'},
+  {day:'d27',char:'數字七',jyut:'cat1',tone:7,zh:'七',hint:'陰入 7'},
+  {day:'d27',char:'數字八',jyut:'baat3',tone:3,zh:'八',hint:'陰去 3（實為中入 8）'},
+  {day:'d27',char:'數字九',jyut:'gau2',tone:2,zh:'九',hint:'陰上 2'},
+  {day:'d27',char:'數字十',jyut:'sap6',tone:9,zh:'十',hint:'陽入 9'},
+  {day:'d28',char:'一百',jyut:'jat1 baak3',tone:7,zh:'一百',hint:'入聲接陰去'},
+  {day:'d28',char:'一千',jyut:'jat1 cin1',tone:7,zh:'一千',hint:'入聲接陰平'},
+  {day:'d28',char:'一萬',jyut:'jat1 maan6',tone:7,zh:'一萬',hint:'入聲接陽去'},
+  {day:'d28',char:'半',jyut:'bun3',tone:3,zh:'半',hint:'陰去 3'},
+  {day:'d28',char:'第一',jyut:'dai6 jat1',tone:6,zh:'第一',hint:'陽去接陰入'},
+  {day:'d28',char:'最後',jyut:'zeoi3 hau6',tone:3,zh:'最後',hint:'陰去接陽去'},
+  {day:'d28',char:'差唔多',jyut:'caa1 m4 do1',tone:1,zh:'差不多',hint:'陰平+陽平+陰平'},
+  {day:'d28',char:'一半',jyut:'jat1 bun3',tone:7,zh:'一半',hint:'入聲接陰去'},
+  {day:'d28',char:'加埋',jyut:'gaa1 maai4',tone:1,zh:'加起來／合計',hint:'陰平接陽平'},
+  {day:'d28',char:'共',jyut:'gung6',tone:6,zh:'共計',hint:'陽去 6，結算用'},
+  // ── Day 29-35 (Week 5) ────────────────────────────────────
+  {day:'d29',char:'試',jyut:'si3',tone:3,zh:'試',hint:'陰去 3，降調練習'},
+  {day:'d29',char:'事',jyut:'si6',tone:6,zh:'事情',hint:'陽去 6，試 vs 事'},
+  {day:'d29',char:'意',jyut:'ji3',tone:3,zh:'意思',hint:'陰去 3'},
+  {day:'d29',char:'易',jyut:'ji6',tone:6,zh:'容易',hint:'陽去 6，意 vs 易'},
+  {day:'d29',char:'正',jyut:'zing3',tone:3,zh:'正確',hint:'陰去 3'},
+  {day:'d29',char:'靜',jyut:'zing6',tone:6,zh:'安靜',hint:'陽去 6，正 vs 靜'},
+  {day:'d29',char:'路',jyut:'lou6',tone:6,zh:'路',hint:'陽去 6'},
+  {day:'d29',char:'露',jyut:'lou6',tone:6,zh:'露水',hint:'路露同音'},
+  {day:'d29',char:'布',jyut:'bou3',tone:3,zh:'布料',hint:'陰去 3'},
+  {day:'d29',char:'步',jyut:'bou6',tone:6,zh:'步伐',hint:'陽去 6，布 vs 步'},
+  {day:'d30',char:'色',jyut:'sik7',tone:7,zh:'顏色',hint:'陰入 7，高短促'},
+  {day:'d30',char:'錫',jyut:'sik8',tone:8,zh:'錫（金屬）',hint:'中入 8'},
+  {day:'d30',char:'食',jyut:'sik9',tone:9,zh:'吃',hint:'陽入 9，低短促'},
+  {day:'d30',char:'一',jyut:'jat7',tone:7,zh:'一',hint:'陰入 7，高短促'},
+  {day:'d30',char:'日',jyut:'jat9',tone:9,zh:'日子',hint:'陽入 9，一 vs 日'},
+  {day:'d30',char:'黑',jyut:'hak1',tone:7,zh:'黑色',hint:'陰入 7'},
+  {day:'d30',char:'白',jyut:'baak6',tone:9,zh:'白色',hint:'陽入 9，黑 vs 白'},
+  {day:'d30',char:'北',jyut:'bak1',tone:7,zh:'北方',hint:'陰入 7'},
+  {day:'d30',char:'學',jyut:'hok6',tone:9,zh:'學習',hint:'陽入 9，北 vs 學'},
+  {day:'d30',char:'竹',jyut:'zuk1',tone:7,zh:'竹子',hint:'陰入 7'},
+  {day:'d31',char:'屋',jyut:'uk1',tone:7,zh:'房子',hint:'陰入 7'},
+  {day:'d31',char:'肉',jyut:'juk6',tone:9,zh:'肉',hint:'陽入 9，屋 vs 肉'},
+  {day:'d31',char:'菊',jyut:'guk1',tone:7,zh:'菊花',hint:'陰入 7'},
+  {day:'d31',char:'局',jyut:'guk6',tone:9,zh:'局面',hint:'陽入 9，菊 vs 局'},
+  {day:'d31',char:'筆',jyut:'bat1',tone:7,zh:'筆',hint:'陰入 7'},
+  {day:'d31',char:'別',jyut:'bit6',tone:9,zh:'別人',hint:'陽入 9，筆 vs 別'},
+  {day:'d31',char:'答',jyut:'daap3',tone:3,zh:'回答',hint:'陰去入 3（短促降調）'},
+  {day:'d31',char:'踏',jyut:'daap6',tone:9,zh:'踩踏',hint:'陽入 9，答 vs 踏'},
+  {day:'d31',char:'急',jyut:'gap1',tone:7,zh:'急迫',hint:'陰入 7'},
+  {day:'d31',char:'及',jyut:'kap6',tone:9,zh:'及格',hint:'陽入 9，急 vs 及'},
+  {day:'d32',char:'唔急',jyut:'m4 gap1',tone:4,zh:'不急',hint:'陽平接陰入'},
+  {day:'d32',char:'好急',jyut:'hou2 gap1',tone:2,zh:'很急',hint:'陰上接陰入'},
+  {day:'d32',char:'即刻',jyut:'zik1 hak1',tone:7,zh:'立刻',hint:'兩個陰入 7'},
+  {day:'d32',char:'突然',jyut:'dat6 jin4',tone:9,zh:'突然',hint:'陽入接陽平'},
+  {day:'d32',char:'慢慢',jyut:'maan6 maan2',tone:6,zh:'慢慢來',hint:'陽去接陰上'},
+  {day:'d32',char:'快啲',jyut:'faai3 di1',tone:3,zh:'快一點',hint:'陰去接陰平'},
+  {day:'d32',char:'等等',jyut:'dang2 dang2',tone:2,zh:'等一下',hint:'疊字，兩個陰上 2'},
+  {day:'d32',char:'唔係咁',jyut:'m4 hai6 gam3',tone:4,zh:'不是這樣',hint:'陽平+陽去+陰去'},
+  {day:'d32',char:'點都好',jyut:'dim2 dou1 hou2',tone:2,zh:'無論如何',hint:'三字，陰上+陰平+陰上'},
+  {day:'d32',char:'算喇',jyut:'syun3 laa3',tone:3,zh:'算了吧',hint:'陰去接陰去'},
+  {day:'d33',char:'可唔可以',jyut:'ho2 m4 ho2 ji5',tone:2,zh:'可不可以',hint:'正式請求'},
+  {day:'d33',char:'得唔得閒',jyut:'dak1 m4 dak1 haan4',tone:7,zh:'有沒有空',hint:'入聲夾陽平'},
+  {day:'d33',char:'方唔方便',jyut:'fong1 m4 fong1 bin6',tone:1,zh:'方不方便',hint:'陰平夾陽去'},
+  {day:'d33',char:'係咁先',jyut:'hai6 gam3 sin1',tone:6,zh:'就這樣先',hint:'告辭常用'},
+  {day:'d33',char:'改日再傾',jyut:'goi2 jat6 zoi3 king1',tone:2,zh:'改天再聊',hint:'婉拒或結束話題'},
+  {day:'d33',char:'有空再約',jyut:'jau5 hung1 zoi3 joek3',tone:5,zh:'有空再約',hint:'陽上+陰平+再+陰去'},
+  {day:'d33',char:'睇吓先',jyut:'tai2 haa5 sin1',tone:2,zh:'先看看再說',hint:'陰上+陽上+陰平'},
+  {day:'d33',char:'諗吓先',jyut:'nam2 haa5 sin1',tone:2,zh:'先想想再說',hint:'陰上+陽上+陰平'},
+  {day:'d33',char:'再諗諗',jyut:'zoi3 nam2 nam2',tone:3,zh:'再想想',hint:'陰去接兩個陰上'},
+  {day:'d33',char:'唔好意思打擾',jyut:'m4 hou2 ji3 si3 daa2 jiu2',tone:4,zh:'抱歉打擾',hint:'正式道歉開頭'},
+  {day:'d34',char:'旅行',jyut:'leoi5 hang4',tone:5,zh:'旅行',hint:'陽上接陽平'},
+  {day:'d34',char:'訂房',jyut:'deng6 fong4',tone:6,zh:'訂房',hint:'陽去接陽平'},
+  {day:'d34',char:'入住',jyut:'jap6 zyu3',tone:9,zh:'入住',hint:'陽入接陰去'},
+  {day:'d34',char:'退房',jyut:'teoi3 fong4',tone:3,zh:'退房',hint:'陰去接陽平'},
+  {day:'d34',char:'行李',jyut:'hang4 lei5',tone:4,zh:'行李',hint:'陽平接陽上'},
+  {day:'d34',char:'護照',jyut:'wu6 ziu3',tone:6,zh:'護照',hint:'陽去接陰去'},
+  {day:'d34',char:'兌換',jyut:'deoi3 wun6',tone:3,zh:'兌換（貨幣）',hint:'陰去接陽去'},
+  {day:'d34',char:'唔識路',jyut:'m4 sik1 lou6',tone:4,zh:'不認識路',hint:'陽平+陰入+陽去'},
+  {day:'d34',char:'迷路',jyut:'mai4 lou6',tone:4,zh:'迷路',hint:'陽平接陽去'},
+  {day:'d34',char:'幫我叫的士',jyut:'bong1 ngo5 giu3 dik1 si2',tone:1,zh:'幫我叫計程車',hint:'旅遊必備句'},
+  {day:'d35',char:'天氣',jyut:'tin1 hei3',tone:1,zh:'天氣',hint:'陰平接陰去'},
+  {day:'d35',char:'落雨',jyut:'lok6 jyu5',tone:6,zh:'下雨',hint:'陽去接陽上'},
+  {day:'d35',char:'打風',jyut:'daa2 fung1',tone:2,zh:'颱風',hint:'陰上接陰平'},
+  {day:'d35',char:'出太陽',jyut:'ceot1 taai3 joeng4',tone:1,zh:'出太陽',hint:'陰平+陰去+陽平'},
+  {day:'d35',char:'好天',jyut:'hou2 tin1',tone:2,zh:'好天氣',hint:'陰上接陰平'},
+  {day:'d35',char:'凍到震',jyut:'dung3 dou3 zan3',tone:3,zh:'冷到發抖',hint:'三個陰去 3'},
+  {day:'d35',char:'熱到出汗',jyut:'jit6 dou3 ceot1 hon6',tone:9,zh:'熱到出汗',hint:'陽入+陰去+陰平+陽去'},
+  {day:'d35',char:'濕住',jyut:'sap1 zyu6',tone:7,zh:'濕的',hint:'入聲接陽去'},
+  {day:'d35',char:'帶遮',jyut:'daai3 ze1',tone:3,zh:'帶雨傘',hint:'陰去接陰平'},
+  {day:'d35',char:'防曬',jyut:'fong4 saai3',tone:4,zh:'防曬',hint:'陽平接陰去'},
+  // ── Day 36-42 (Week 6) ────────────────────────────────────
+  {day:'d36',char:'佢哋',jyut:'keoi5 dei6',tone:5,zh:'他們',hint:'陽上接陽去'},
+  {day:'d36',char:'我哋',jyut:'ngo5 dei6',tone:5,zh:'我們',hint:'陽上接陽去'},
+  {day:'d36',char:'你哋',jyut:'nei5 dei6',tone:5,zh:'你們',hint:'陽上接陽去'},
+  {day:'d36',char:'大家',jyut:'daai6 gaa1',tone:6,zh:'大家',hint:'陽去接陰平'},
+  {day:'d36',char:'自己',jyut:'zi6 gei2',tone:6,zh:'自己',hint:'陽去接陰上'},
+  {day:'d36',char:'人哋',jyut:'jan4 dei6',tone:4,zh:'別人',hint:'陽平接陽去'},
+  {day:'d36',char:'朋友',jyut:'pang4 jau5',tone:4,zh:'朋友',hint:'陽平接陽上'},
+  {day:'d36',char:'同事',jyut:'tung4 si6',tone:4,zh:'同事',hint:'陽平接陽去'},
+  {day:'d36',char:'老闆',jyut:'lou5 baan2',tone:5,zh:'老闆',hint:'陽上接陰上'},
+  {day:'d36',char:'客人',jyut:'haak3 jan4',tone:3,zh:'客人',hint:'陰去接陽平'},
+  {day:'d37',char:'係咁先喇',jyut:'hai6 gam3 sin1 laa3',tone:6,zh:'就先這樣了',hint:'道別常用'},
+  {day:'d37',char:'好，係咁',jyut:'hou2 hai6 gam3',tone:2,zh:'好，就這樣',hint:'確認結束'},
+  {day:'d37',char:'唔該晒你',jyut:'m4 goi1 saai3 nei5',tone:4,zh:'非常感謝你',hint:'強調感謝'},
+  {day:'d37',char:'多謝你幫手',jyut:'do1 ze6 nei5 bong1 sau2',tone:1,zh:'謝謝你的幫助',hint:'五字感謝句'},
+  {day:'d37',char:'下次再傾',jyut:'haa6 ci3 zoi3 king1',tone:6,zh:'下次再聊',hint:'四字，陽去+陰去+再+陰平'},
+  {day:'d37',char:'有事搵我',jyut:'jau5 si6 wan2 ngo5',tone:5,zh:'有事找我',hint:'陽上+陽去+陰上+陽上'},
+  {day:'d37',char:'保持聯絡',jyut:'bou2 ci4 lyun4 lok3',tone:2,zh:'保持聯絡',hint:'四字，陰上+陽平+陽平+陰去'},
+  {day:'d37',char:'期待合作',jyut:'kei4 doi6 hap6 zok3',tone:4,zh:'期待合作',hint:'商務結尾'},
+  {day:'d37',char:'請多關照',jyut:'cing2 do1 gwaan1 ziu3',tone:2,zh:'請多關照',hint:'正式請求照顧'},
+  {day:'d37',char:'後會有期',jyut:'hau6 wui6 jau5 kei4',tone:6,zh:'後會有期',hint:'正式告別'},
+  {day:'d38',char:'做生意',jyut:'zou6 saang1 ji3',tone:6,zh:'做生意',hint:'陽去+陰平+陰去'},
+  {day:'d38',char:'傾生意',jyut:'king1 saang1 ji3',tone:1,zh:'談生意',hint:'陰平+陰平+陰去'},
+  {day:'d38',char:'簽合同',jyut:'cim1 hap6 tung4',tone:1,zh:'簽合同',hint:'陰平+陽入+陽平'},
+  {day:'d38',char:'報價',jyut:'bou3 gaa3',tone:3,zh:'報價',hint:'陰去接陰去'},
+  {day:'d38',char:'還價',jyut:'waan4 gaa3',tone:4,zh:'還價',hint:'陽平接陰去'},
+  {day:'d38',char:'成交',jyut:'sing4 gaau1',tone:4,zh:'成交',hint:'陽平接陰平'},
+  {day:'d38',char:'取消',jyut:'ceoi2 siu1',tone:2,zh:'取消',hint:'陰上接陰平'},
+  {day:'d38',char:'延期',jyut:'jin4 kei4',tone:4,zh:'延期',hint:'陽平接陽平'},
+  {day:'d38',char:'確認',jyut:'kok3 jing6',tone:3,zh:'確認',hint:'陰去接陽去'},
+  {day:'d38',char:'批准',jyut:'pai1 zeon2',tone:1,zh:'批准',hint:'陰平接陰上'},
+  {day:'d39',char:'頂',jyut:'deng2',tone:2,zh:'最頂／撐住',hint:'陰上 2，口語'},
+  {day:'d39',char:'型',jyut:'jing4',tone:4,zh:'帥氣',hint:'陽平 4'},
+  {day:'d39',char:'掂',jyut:'dim6',tone:6,zh:'妥當',hint:'陽去 6'},
+  {day:'d39',char:'靚',jyut:'leng3',tone:3,zh:'漂亮',hint:'陰去 3'},
+  {day:'d39',char:'叻',jyut:'lek1',tone:7,zh:'聰明能幹',hint:'入聲 7'},
+  {day:'d39',char:'勁',jyut:'ging6',tone:6,zh:'厲害',hint:'陽去 6'},
+  {day:'d39',char:'核突',jyut:'wat6 dat6',tone:9,zh:'噁心',hint:'兩個陽入 9'},
+  {day:'d39',char:'痴線',jyut:'ci1 sin3',tone:1,zh:'瘋了',hint:'陰平接陰去'},
+  {day:'d39',char:'扮嘢',jyut:'baan6 je5',tone:6,zh:'裝模作樣',hint:'陽去接陽上'},
+  {day:'d39',char:'串',jyut:'cyun3',tone:3,zh:'囂張',hint:'陰去 3，口語'},
+  {day:'d40',char:'我係台灣人',jyut:'ngo5 hai6 toi4 waan1 jan4',tone:5,zh:'我是台灣人',hint:'自我介紹必備'},
+  {day:'d40',char:'我係台北嚟㗎',jyut:'ngo5 hai6 toi4 bak1 lai4 ga3',tone:5,zh:'我來自台北',hint:'說明來處'},
+  {day:'d40',char:'我學緊廣東話',jyut:'ngo5 hok6 gan2 gwong2 dung1 waa2',tone:5,zh:'我在學粵語',hint:'學習者必備句'},
+  {day:'d40',char:'請你講慢啲',jyut:'cing2 nei5 gong2 maan6 di1',tone:2,zh:'請說慢一點',hint:'學習者常用'},
+  {day:'d40',char:'可唔可以再講多次',jyut:'ho2 m4 ho2 ji5 zoi3 gong2 do1 ci3',tone:2,zh:'可以再說一次嗎',hint:'確認理解'},
+  {day:'d40',char:'你㗎廣東話好叻',jyut:'nei5 ge3 gwong2 dung1 waa2 hou2 lek1',tone:5,zh:'你的粵語很好',hint:'稱讚對方'},
+  {day:'d40',char:'唔係喎，仲差得遠',jyut:'m4 hai6 wo3 zung6 caa1 dak1 jyun5',tone:4,zh:'哪裡，還差得遠',hint:'謙虛回應'},
+  {day:'d40',char:'我好鍾意學廣東話',jyut:'ngo5 hou2 zung1 ji3 hok6 gwong2 dung1 waa2',tone:5,zh:'我很喜歡學粵語',hint:'表達學習熱情'},
+  {day:'d40',char:'廣東話好難學',jyut:'gwong2 dung1 waa2 hou2 naan4 hok6',tone:2,zh:'粵語很難學',hint:'感嘆難度'},
+  {day:'d40',char:'但係好有趣',jyut:'daan6 hai6 hou2 jau5 ceoi3',tone:6,zh:'但是很有趣',hint:'陽去+陽去+陰上+陽上+陰去'},
+  // ── Day 41-49 (Week 7) ────────────────────────────────────
+  {day:'d41',char:'詩',jyut:'si1',tone:1,zh:'詩（混合測試）',hint:'陰平 1，9調混合練習開始'},
+  {day:'d41',char:'史',jyut:'si2',tone:2,zh:'歷史',hint:'陰上 2'},
+  {day:'d41',char:'試',jyut:'si3',tone:3,zh:'試驗',hint:'陰去 3'},
+  {day:'d41',char:'時',jyut:'si4',tone:4,zh:'時間',hint:'陽平 4'},
+  {day:'d41',char:'市',jyut:'si5',tone:5,zh:'市場',hint:'陽上 5'},
+  {day:'d41',char:'事',jyut:'si6',tone:6,zh:'事情',hint:'陽去 6'},
+  {day:'d41',char:'色',jyut:'sik7',tone:7,zh:'顏色',hint:'陰入 7'},
+  {day:'d41',char:'錫',jyut:'sik8',tone:8,zh:'錫金屬',hint:'中入 8'},
+  {day:'d41',char:'食',jyut:'sik9',tone:9,zh:'吃',hint:'陽入 9'},
+  {day:'d41',char:'分',jyut:'fan1',tone:1,zh:'分鐘',hint:'陰平 1，新字根練習'},
+  {day:'d42',char:'粉',jyut:'fan2',tone:2,zh:'粉末',hint:'陰上 2'},
+  {day:'d42',char:'訓',jyut:'fan3',tone:3,zh:'睡覺',hint:'陰去 3'},
+  {day:'d42',char:'墳',jyut:'fan4',tone:4,zh:'墳墓',hint:'陽平 4'},
+  {day:'d42',char:'憤',jyut:'fan5',tone:5,zh:'憤怒',hint:'陽上 5'},
+  {day:'d42',char:'份',jyut:'fan6',tone:6,zh:'份量',hint:'陽去 6'},
+  {day:'d42',char:'筆',jyut:'bat1',tone:7,zh:'筆',hint:'陰入 7'},
+  {day:'d42',char:'別',jyut:'bit6',tone:9,zh:'分別',hint:'陽入 9'},
+  {day:'d42',char:'撥',jyut:'but6',tone:9,zh:'撥打',hint:'陽入 9'},
+  {day:'d42',char:'八',jyut:'baat3',tone:3,zh:'八',hint:'陰去（中入）'},
+  {day:'d42',char:'拔',jyut:'bat6',tone:9,zh:'拔掉',hint:'陽入 9'},
+  {day:'d43',char:'知',jyut:'zi1',tone:1,zh:'知道',hint:'陰平 1，zi 字根'},
+  {day:'d43',char:'紙',jyut:'zi2',tone:2,zh:'紙張',hint:'陰上 2'},
+  {day:'d43',char:'志',jyut:'zi3',tone:3,zh:'志向',hint:'陰去 3'},
+  {day:'d43',char:'字',jyut:'zi6',tone:6,zh:'文字',hint:'陽去 6'},
+  {day:'d43',char:'子',jyut:'zi2',tone:2,zh:'孩子',hint:'陰上 2'},
+  {day:'d43',char:'自',jyut:'zi6',tone:6,zh:'自己',hint:'陽去 6'},
+  {day:'d43',char:'即',jyut:'zik1',tone:7,zh:'即刻',hint:'陰入 7'},
+  {day:'d43',char:'直',jyut:'zik6',tone:9,zh:'直接',hint:'陽入 9'},
+  {day:'d43',char:'節',jyut:'zit3',tone:3,zh:'節日',hint:'陰去（入）'},
+  {day:'d43',char:'賊',jyut:'caak6',tone:9,zh:'賊',hint:'陽入 9'},
+  {day:'d44',char:'花',jyut:'faa1',tone:1,zh:'花朵',hint:'陰平 1'},
+  {day:'d44',char:'化',jyut:'faa3',tone:3,zh:'化妝',hint:'陰去 3'},
+  {day:'d44',char:'話',jyut:'waa6',tone:6,zh:'說話',hint:'陽去 6'},
+  {day:'d44',char:'畫',jyut:'waa2',tone:2,zh:'繪畫',hint:'陰上 2'},
+  {day:'d44',char:'罰',jyut:'fat6',tone:9,zh:'懲罰',hint:'陽入 9'},
+  {day:'d44',char:'法',jyut:'faat3',tone:3,zh:'方法',hint:'陰去（入）'},
+  {day:'d44',char:'發',jyut:'faat3',tone:3,zh:'發達',hint:'陰去（入），法發同音'},
+  {day:'d44',char:'乏',jyut:'fat6',tone:9,zh:'疲乏',hint:'陽入 9'},
+  {day:'d44',char:'忽',jyut:'fat1',tone:7,zh:'忽然',hint:'陰入 7'},
+  {day:'d44',char:'佛',jyut:'fat6',tone:9,zh:'佛陀',hint:'陽入 9'},
+  {day:'d45',char:'心',jyut:'sam1',tone:1,zh:'心',hint:'陰平 1'},
+  {day:'d45',char:'審',jyut:'sam2',tone:2,zh:'審查',hint:'陰上 2'},
+  {day:'d45',char:'滲',jyut:'sam3',tone:3,zh:'滲透',hint:'陰去 3'},
+  {day:'d45',char:'尋',jyut:'cam4',tone:4,zh:'尋找',hint:'陽平 4'},
+  {day:'d45',char:'甚',jyut:'sam6',tone:6,zh:'甚至',hint:'陽去 6'},
+  {day:'d45',char:'習',jyut:'zaap6',tone:9,zh:'習慣',hint:'陽入 9'},
+  {day:'d45',char:'執',jyut:'zap1',tone:7,zh:'執拾',hint:'陰入 7'},
+  {day:'d45',char:'集',jyut:'zaap6',tone:9,zh:'集合',hint:'陽入 9'},
+  {day:'d45',char:'接',jyut:'zip3',tone:3,zh:'接受',hint:'陰去（入）'},
+  {day:'d45',char:'捷',jyut:'zit6',tone:9,zh:'便捷',hint:'陽入 9'},
+  // ── Day 46-56 (Week 8) ────────────────────────────────────
+  {day:'d46',char:'高',jyut:'gou1',tone:1,zh:'高',hint:'陰平 1'},
+  {day:'d46',char:'稿',jyut:'gou2',tone:2,zh:'稿件',hint:'陰上 2'},
+  {day:'d46',char:'告',jyut:'gou3',tone:3,zh:'告知',hint:'陰去 3'},
+  {day:'d46',char:'豪',jyut:'hou4',tone:4,zh:'豪華',hint:'陽平 4'},
+  {day:'d46',char:'蠔',jyut:'hou4',tone:4,zh:'生蠔',hint:'陽平 4，豪蠔同音'},
+  {day:'d46',char:'號',jyut:'hou6',tone:6,zh:'號碼',hint:'陽去 6'},
+  {day:'d46',char:'克',jyut:'hak1',tone:7,zh:'克服',hint:'陰入 7'},
+  {day:'d46',char:'國',jyut:'gwok3',tone:3,zh:'國家',hint:'陰去（入）'},
+  {day:'d46',char:'閣',jyut:'gok3',tone:3,zh:'閣下',hint:'陰去（入）'},
+  {day:'d46',char:'或',jyut:'waak6',tone:9,zh:'或者',hint:'陽入 9'},
+  {day:'d47',char:'開',jyut:'hoi1',tone:1,zh:'開始',hint:'陰平 1'},
+  {day:'d47',char:'海',jyut:'hoi2',tone:2,zh:'海洋',hint:'陰上 2'},
+  {day:'d47',char:'戒',jyut:'gaai3',tone:3,zh:'戒掉',hint:'陰去 3'},
+  {day:'d47',char:'解',jyut:'gaai2',tone:2,zh:'解釋',hint:'陰上 2'},
+  {day:'d47',char:'界',jyut:'gaai3',tone:3,zh:'世界',hint:'陰去 3，解 vs 界'},
+  {day:'d47',char:'街',jyut:'gaai1',tone:1,zh:'街道',hint:'陰平 1'},
+  {day:'d47',char:'屆',jyut:'gaai3',tone:3,zh:'屆時',hint:'陰去 3'},
+  {day:'d47',char:'刮',jyut:'gwaat3',tone:3,zh:'刮風',hint:'陰去（入）'},
+  {day:'d47',char:'割',jyut:'got3',tone:3,zh:'割斷',hint:'陰去（入）'},
+  {day:'d47',char:'骨',jyut:'gwat1',tone:7,zh:'骨頭',hint:'陰入 7'},
+  {day:'d48',char:'見',jyut:'gin3',tone:3,zh:'見面',hint:'陰去 3'},
+  {day:'d48',char:'健',jyut:'gin6',tone:6,zh:'健康',hint:'陽去 6，見 vs 健'},
+  {day:'d48',char:'件',jyut:'gin6',tone:6,zh:'件數',hint:'陽去 6'},
+  {day:'d48',char:'間',jyut:'gaan1',tone:1,zh:'中間',hint:'陰平 1'},
+  {day:'d48',char:'簡',jyut:'gaan2',tone:2,zh:'簡單',hint:'陰上 2'},
+  {day:'d48',char:'揀',jyut:'gaan2',tone:2,zh:'選擇',hint:'陰上 2，簡揀同音'},
+  {day:'d48',char:'鑑',jyut:'gaam3',tone:3,zh:'鑑賞',hint:'陰去 3'},
+  {day:'d48',char:'減',jyut:'gaam2',tone:2,zh:'減少',hint:'陰上 2'},
+  {day:'d48',char:'急',jyut:'gap1',tone:7,zh:'緊急',hint:'陰入 7'},
+  {day:'d48',char:'及',jyut:'kap6',tone:9,zh:'及格',hint:'陽入 9'},
+  {day:'d49',char:'鐘意',jyut:'zung1 ji3',tone:1,zh:'喜歡',hint:'陰平接陰去'},
+  {day:'d49',char:'唔鐘意',jyut:'m4 zung1 ji3',tone:4,zh:'不喜歡',hint:'陽平+陰平+陰去'},
+  {day:'d49',char:'最鐘意',jyut:'zeoi3 zung1 ji3',tone:3,zh:'最喜歡',hint:'陰去+陰平+陰去'},
+  {day:'d49',char:'冇所謂',jyut:'mou5 so2 wai6',tone:5,zh:'無所謂',hint:'陽上+陰上+陽去'},
+  {day:'d49',char:'隨便',jyut:'ceoi4 bin6',tone:4,zh:'隨便',hint:'陽平接陽去'},
+  {day:'d49',char:'睇情況',jyut:'tai2 cing4 fong3',tone:2,zh:'視情況',hint:'陰上+陽平+陰去'},
+  {day:'d49',char:'視乎',jyut:'si6 fu1',tone:6,zh:'視乎（取決於）',hint:'陽去接陰平'},
+  {day:'d49',char:'唔一定',jyut:'m4 jat1 ding6',tone:4,zh:'不一定',hint:'陽平+陰入+陽去'},
+  {day:'d49',char:'未必',jyut:'mei6 bit1',tone:6,zh:'未必',hint:'陽去接陰入'},
+  {day:'d49',char:'難講',jyut:'naan4 gong2',tone:4,zh:'難說',hint:'陽平接陰上'},
+  {day:'d50',char:'講笑',jyut:'gong2 siu3',tone:2,zh:'開玩笑',hint:'陰上接陰去'},
+  {day:'d50',char:'玩嘢',jyut:'waan2 je5',tone:2,zh:'玩樂',hint:'陰上接陽上'},
+  {day:'d50',char:'得閒',jyut:'dak1 haan4',tone:7,zh:'有空閒',hint:'陰入接陽平'},
+  {day:'d50',char:'唔得閒',jyut:'m4 dak1 haan4',tone:4,zh:'沒空',hint:'陽平+陰入+陽平'},
+  {day:'d50',char:'忙到暈',jyut:'mong4 dou3 wan4',tone:4,zh:'忙到暈頭',hint:'誇張表達忙碌'},
+  {day:'d50',char:'瞓覺',jyut:'fan3 gaau3',tone:3,zh:'睡覺',hint:'兩個陰去 3'},
+  {day:'d50',char:'唔夠瞓',jyut:'m4 gau3 fan3',tone:4,zh:'睡不夠',hint:'陽平+陰去+陰去'},
+  {day:'d50',char:'頂唔順',jyut:'deng2 m4 seon6',tone:2,zh:'撐不住了',hint:'陰上+陽平+陽去'},
+  {day:'d50',char:'好撚煩',jyut:'hou2 faan4',tone:2,zh:'非常煩（強調語氣）',hint:'口語強調'},
+  {day:'d50',char:'唔係咁講',jyut:'m4 hai6 gam3 gong2',tone:4,zh:'不是這樣說的',hint:'反駁常用'},
+  {day:'d51',char:'多謝',jyut:'do1 ze6',tone:1,zh:'多謝（複習）',hint:'第 8 週：9調綜合鞏固'},
+  {day:'d51',char:'請問',jyut:'cing2 man6',tone:2,zh:'請問（複習）',hint:'陰上接陽去'},
+  {day:'d51',char:'失陪',jyut:'sat1 pui4',tone:7,zh:'失陪（複習）',hint:'入聲接陽平'},
+  {day:'d51',char:'搞掂',jyut:'gaau2 dim6',tone:2,zh:'搞定（複習）',hint:'陰上接陽去'},
+  {day:'d51',char:'冇問題',jyut:'mou5 man6 tai4',tone:5,zh:'沒問題（複習）',hint:'陽上+陽去+陽平'},
+  {day:'d51',char:'係噉意',jyut:'hai6 gam3 ji3',tone:6,zh:'就是這個意思',hint:'陽去+陰去+陰去'},
+  {day:'d51',char:'好在',jyut:'hou2 zoi6',tone:2,zh:'幸好',hint:'陰上接陽去'},
+  {day:'d51',char:'唔知幾好',jyut:'m4 zi1 gei2 hou2',tone:4,zh:'不知道有多好',hint:'感嘆句'},
+  {day:'d51',char:'講得好',jyut:'gong2 dak1 hou2',tone:2,zh:'說得好',hint:'陰上+陰入+陰上'},
+  {day:'d51',char:'你估下',jyut:'nei5 gu2 haa5',tone:5,zh:'你猜猜',hint:'陽上+陰上+陽上'},
+  {day:'d52',char:'點都唔',jyut:'dim2 dou1 m4',tone:2,zh:'怎樣都不',hint:'三字否定加強'},
+  {day:'d52',char:'又係喎',jyut:'jau6 hai6 wo3',tone:6,zh:'也是呢',hint:'陽去接陽去接陰去'},
+  {day:'d52',char:'原來係咁',jyut:'jyun4 loi4 hai6 gam3',tone:4,zh:'原來是這樣',hint:'四字，恍然大悟'},
+  {day:'d52',char:'冇理由',jyut:'mou5 lei5 jau4',tone:5,zh:'沒道理',hint:'陽上+陽上+陽平'},
+  {day:'d52',char:'咁都得',jyut:'gam3 dou1 dak1',tone:3,zh:'這樣也行',hint:'陰去+陰平+陰入'},
+  {day:'d52',char:'照舊',jyut:'ziu3 gau6',tone:3,zh:'照舊',hint:'陰去接陽去'},
+  {day:'d52',char:'順便',jyut:'seon6 bin6',tone:6,zh:'順便',hint:'兩個陽去 6'},
+  {day:'d52',char:'唔洗',jyut:'m4 sai2',tone:4,zh:'不用（不需要）',hint:'陽平接陰上'},
+  {day:'d52',char:'唔駛',jyut:'m4 sai2',tone:4,zh:'不用（口語）',hint:'與唔洗同音'},
+  {day:'d52',char:'係囉',jyut:'hai6 lo3',tone:6,zh:'就是嘛',hint:'陽去接陰去，同意語氣'},
+  {day:'d53',char:'好彩',jyut:'hou2 coi2',tone:2,zh:'幸運',hint:'陰上接陰上'},
+  {day:'d53',char:'唔好彩',jyut:'m4 hou2 coi2',tone:4,zh:'不幸運',hint:'陽平+陰上+陰上'},
+  {day:'d53',char:'梗有',jyut:'gang2 jau5',tone:2,zh:'一定有',hint:'陰上接陽上'},
+  {day:'d53',char:'梗冇',jyut:'gang2 mou5',tone:2,zh:'一定沒有',hint:'陰上接陽上'},
+  {day:'d53',char:'估唔到',jyut:'gu2 m4 dou3',tone:2,zh:'想不到',hint:'陰上+陽平+陰去'},
+  {day:'d53',char:'點都好過',jyut:'dim2 dou1 hou2 gwo3',tone:2,zh:'怎樣都比較好',hint:'比較句'},
+  {day:'d53',char:'好過唔做',jyut:'hou2 gwo3 m4 zou6',tone:2,zh:'好過不做',hint:'陰上+陰去+陽平+陽去'},
+  {day:'d53',char:'做咗先算',jyut:'zou6 zo2 sin1 syun3',tone:6,zh:'先做了再說',hint:'決定行動'},
+  {day:'d53',char:'等下先講',jyut:'dang2 haa5 sin1 gong2',tone:2,zh:'等一下再說',hint:'陰上+陽上+陰平+陰上'},
+  {day:'d53',char:'咪係囉',jyut:'mai6 hai6 lo3',tone:6,zh:'可不是嘛',hint:'三個字語氣詞'},
+  {day:'d54',char:'噉樣',jyut:'gam2 joeng2',tone:2,zh:'這樣子',hint:'陰上接陰上'},
+  {day:'d54',char:'嗰樣',jyut:'go2 joeng6',tone:2,zh:'那樣子',hint:'陰上接陽去'},
+  {day:'d54',char:'點解噉㗎',jyut:'dim2 gaai2 gam3 ga3',tone:2,zh:'為什麼這樣',hint:'四字疑問'},
+  {day:'d54',char:'係噉㗎啦',jyut:'hai6 gam3 ga3 laa3',tone:6,zh:'就是這樣了嘛',hint:'解釋+語氣'},
+  {day:'d54',char:'唔通係噉',jyut:'m4 tung1 hai6 gam3',tone:4,zh:'難道是這樣',hint:'反問語氣'},
+  {day:'d54',char:'真係咁㗎',jyut:'zan1 hai6 gam3 ga3',tone:1,zh:'真的是這樣',hint:'肯定陳述'},
+  {day:'d54',char:'係真㗎',jyut:'hai6 zan1 ga3',tone:6,zh:'是真的',hint:'三字肯定'},
+  {day:'d54',char:'係假㗎',jyut:'hai6 gaa2 ga3',tone:6,zh:'是假的',hint:'三字否定'},
+  {day:'d54',char:'你話㗎',jyut:'nei5 waa6 ga3',tone:5,zh:'是你說的',hint:'追責語氣'},
+  {day:'d54',char:'唔係我話',jyut:'m4 hai6 ngo5 waa6',tone:4,zh:'不是我說的',hint:'推卸語氣'},
+  {day:'d55',char:'攞去用',jyut:'lo2 heoi3 jung6',tone:2,zh:'拿去用',hint:'陰上+陰去+陽去'},
+  {day:'d55',char:'執返嚟',jyut:'zap1 faan1 lai4',tone:7,zh:'撿回來',hint:'入聲+陰平+陽平'},
+  {day:'d55',char:'放低佢',jyut:'fong3 dai1 keoi5',tone:3,zh:'放下它',hint:'陰去+陰平+陽上'},
+  {day:'d55',char:'搬去邊',jyut:'bun1 heoi3 bin1',tone:1,zh:'搬去哪裡',hint:'陰平+陰去+陰平'},
+  {day:'d55',char:'擺喺度',jyut:'baai2 hai2 dou6',tone:2,zh:'放在這裡',hint:'陰上+陰上+陽去'},
+  {day:'d55',char:'攞咗去邊',jyut:'lo2 zo2 heoi3 bin1',tone:2,zh:'拿去哪裡了',hint:'完成時問句'},
+  {day:'d55',char:'唔見咗',jyut:'m4 gin3 zo2',tone:4,zh:'找不到了',hint:'陽平+陰去+陰上'},
+  {day:'d55',char:'喺呢度',jyut:'hai2 ni1 dou6',tone:2,zh:'在這裡',hint:'陰上+陰平+陽去'},
+  {day:'d55',char:'俾我睇吓',jyut:'bei2 ngo5 tai2 haa5',tone:2,zh:'給我看看',hint:'請求語氣'},
+  {day:'d55',char:'跟住我做',jyut:'gan1 zyu6 ngo5 zou6',tone:1,zh:'跟著我做',hint:'指示動作'},
+  {day:'d56',char:'唔該借借',jyut:'m4 goi1 ze3 ze3',tone:4,zh:'借過一下',hint:'人群中借道'},
+  {day:'d56',char:'小心啲',jyut:'siu2 sam1 di1',tone:2,zh:'小心一點',hint:'陰上+陰平+陰平'},
+  {day:'d56',char:'唔好咁',jyut:'m4 hou2 gam3',tone:4,zh:'不要這樣',hint:'陽平+陰上+陰去'},
+  {day:'d56',char:'算數喇',jyut:'syun3 sou3 laa3',tone:3,zh:'算了',hint:'陰去+陰去+陰去'},
+  {day:'d56',char:'係我唔啱',jyut:'hai6 ngo5 m4 ngaam1',tone:6,zh:'是我不對',hint:'道歉承認錯誤'},
+  {day:'d56',char:'下次唔敢',jyut:'haa6 ci3 m4 gam2',tone:6,zh:'下次不敢了',hint:'陽去+陰去+陽平+陰上'},
+  {day:'d56',char:'唔緊要㗎',jyut:'m4 gan2 jiu3 ga3',tone:4,zh:'沒關係的',hint:'加語氣詞的沒關係'},
+  {day:'d56',char:'大家唔好嬲',jyut:'daai6 gaa1 m4 hou2 nau1',tone:6,zh:'大家別生氣',hint:'安撫語氣'},
+  {day:'d56',char:'多多包涵',jyut:'do1 do1 baau1 haam4',tone:1,zh:'多多包涵',hint:'道歉請求原諒'},
+  {day:'d56',char:'繼續加油',jyut:'gai3 zuk6 gaa1 jau4',tone:3,zh:'繼續加油',hint:'陰去+陽入+陰平+陽平，第一階段完成！'},
+];
+
+const toneColors = {1:'#e8a838',2:'#5b9cf6',3:'#a78bfa',4:'#f97316',5:'#3ec4a0',6:'#8a8880',7:'#e06b8a',8:'#e06b8a',9:'#e06b8a'};
+const toneNames = {1:'陰平',2:'陰上',3:'陰去',4:'陽平',5:'陽上',6:'陽去',7:'陰入',8:'中入',9:'陽入'};
+
+// ── Supabase config ─────────────────────────────────────────
+const SUPABASE_URL = 'https://usoaqwapukmmifskpzly.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVzb2Fxd2FwdWttbWlmc2twemx5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxODg5MjUsImV4cCI6MjA4OTc2NDkyNX0.MHm41_UZKsthKELfpVpnMTxn6J89G38DpkDPFDB_MOY';
+const SUPABASE_READY = SUPABASE_URL !== 'YOUR_SUPABASE_URL';
+
+async function sbFetch(path, method = 'GET', body = null) {
+  if (!SUPABASE_READY) return null;
+  try {
+    const opts = {
+      method,
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': method === 'POST' ? 'resolution=merge-duplicates' : '',
+      },
+    };
+    if (body) opts.body = JSON.stringify(body);
+    const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, opts);
+    if (!res.ok) return null;
+    return method === 'GET' ? await res.json() : true;
+  } catch(e) { return null; }
+}
+
+function getUserId() {
+  let uid = null;
+  try { uid = localStorage.getItem('canton_uid'); } catch(e) {}
+  if (!uid) {
+    uid = 'u_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+    try { localStorage.setItem('canton_uid', uid); } catch(e) {}
+  }
+  return uid;
+}
+
+// ── In-memory state for all syncable data ────────────────────
+let cardNotes = {};          // { "key": "note text" }
+let completedToday = new Set(); // ["tone","anki","listen"]
+let streakCount = 0;
+let lastStudyDate = '';
+let quizStats = { total: 0, correct: 0, toneErrors: {} }; // toneErrors: {tone: count}
+
+function getTodayStr() {
+  return new Date().toISOString().slice(0,10);
+}
+
+// ── Streak logic ──────────────────────────────────────────────
+function updateStreak() {
+  const today = getTodayStr();
+  if (lastStudyDate === today) return; // already counted today
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0,10);
+  if (lastStudyDate === yesterday) {
+    streakCount++;
+  } else if (lastStudyDate !== today) {
+    streakCount = 1; // reset
+  }
+  lastStudyDate = today;
+  renderStreakBadge();
+  syncToSupabase();
+}
+
+function renderStreakBadge() {
+  const el = document.getElementById('streak-badge');
+  if (el) el.textContent = streakCount > 0 ? '🔥 ' + streakCount + ' 天' : '—';
+}
+
+// ── Today checklist ───────────────────────────────────────────
+function toggleTodayTask(task, btn) {
+  if (completedToday.has(task)) {
+    completedToday.delete(task);
+    btn.classList.remove('task-done');
+  } else {
+    completedToday.add(task);
+    btn.classList.add('task-done');
+    updateStreak();
+  }
+  // Reset if new day
+  const today = getTodayStr();
+  if (lastStudyDate && lastStudyDate !== today) completedToday.clear();
+  renderTodayChecklist();
+  syncToSupabase();
+}
+
+function renderTodayChecklist() {
+  const today = getTodayStr();
+  if (lastStudyDate && lastStudyDate !== today) {
+    completedToday.clear();
+  }
+  ['tone','anki','listen'].forEach(task => {
+    const btn = document.getElementById('task-' + task);
+    if (!btn) return;
+    if (completedToday.has(task)) btn.classList.add('task-done');
+    else btn.classList.remove('task-done');
+  });
+  const allDone = ['tone','anki','listen'].every(t => completedToday.has(t));
+  const bar = document.getElementById('today-complete-bar');
+  if (bar) {
+    const pct = Math.round((completedToday.size / 3) * 100);
+    bar.style.width = pct + '%';
+    bar.style.background = allDone ? 'var(--teal)' : 'var(--amber)';
+  }
+  const txt = document.getElementById('today-complete-txt');
+  if (txt) txt.textContent = completedToday.size + ' / 3 完成' + (allDone ? ' ✓' : '');
+}
+
+// ── Quiz stats ────────────────────────────────────────────────
+function recordQuizAnswer(tone, correct) {
+  quizStats.total++;
+  if (correct) {
+    quizStats.correct++;
+  } else {
+    quizStats.toneErrors[tone] = (quizStats.toneErrors[tone] || 0) + 1;
+  }
+  renderQuizStats();
+  syncQuizStats();
+}
+
+function renderQuizStats() {
+  const pct = quizStats.total > 0 ? Math.round(quizStats.correct / quizStats.total * 100) : 0;
+  const el = document.getElementById('score-pct');
+  if (el) el.textContent = quizStats.total > 0 ? pct + '%' : '—';
+  const sc = document.getElementById('score-correct');
+  if (sc) sc.textContent = quizStats.correct;
+  const st = document.getElementById('score-total');
+  if (st) st.textContent = quizStats.total;
+  // Worst tone
+  const worst = document.getElementById('worst-tone');
+  if (worst) {
+    const errs = quizStats.toneErrors;
+    const keys = Object.keys(errs);
+    if (keys.length === 0) { worst.textContent = '—'; return; }
+    const top = keys.sort((a,b) => errs[b]-errs[a])[0];
+    const toneNames = {1:'陰平',2:'陰上',3:'陰去',4:'陽平',5:'陽上',6:'陽去',7:'陰入',8:'中入',9:'陽入'};
+    worst.textContent = (toneNames[top] || '調'+top) + ' (' + errs[top] + '次)';
+  }
+}
+
+let quizSyncTimer = null;
+async function syncQuizStats() {
+  if (!SUPABASE_READY) return;
+  clearTimeout(quizSyncTimer);
+  quizSyncTimer = setTimeout(async () => {
+    await sbFetch('canton_quiz_stats', 'POST', {
+      user_id: getUserId(),
+      total_answered: quizStats.total,
+      total_correct: quizStats.correct,
+      tone_errors: quizStats.toneErrors,
+      updated_at: new Date().toISOString(),
+    });
+  }, 1500);
+}
+
+// ── Card notes ────────────────────────────────────────────────
+function saveNote(key, text) {
+  if (text.trim()) {
+    cardNotes[key] = text.trim();
+  } else {
+    delete cardNotes[key];
+  }
+  syncToSupabase();
+}
+
+// ── Load all from Supabase ────────────────────────────────────
+async function loadFromSupabase() {
+  if (!SUPABASE_READY) return;
+  const uid = getUserId();
+  showSyncStatus('載入中…', 'text3');
+
+  const [progRows, quizRows] = await Promise.all([
+    sbFetch('canton_progress?user_id=eq.' + uid),
+    sbFetch('canton_quiz_stats?user_id=eq.' + uid),
+  ]);
+
+  if (progRows && progRows.length > 0) {
+    const row = progRows[0];
+    if (row.reviewed) {
+      reviewedCards.clear();
+      row.reviewed.forEach(k => reviewedCards.add(k));
+    }
+    if (row.start_date) {
+      try { localStorage.setItem('canton_start_date', row.start_date); } catch(e) {}
+    }
+    if (row.streak != null) streakCount = row.streak;
+    if (row.last_study_date) lastStudyDate = row.last_study_date;
+    if (row.completed_today) {
+      completedToday = new Set(row.completed_today);
+      // clear if stale day
+      const today = getTodayStr();
+      if (lastStudyDate && lastStudyDate !== today) completedToday.clear();
+    }
+    if (row.notes) cardNotes = row.notes;
+  }
+
+  if (quizRows && quizRows.length > 0) {
+    const q = quizRows[0];
+    quizStats.total = q.total_answered || 0;
+    quizStats.correct = q.total_correct || 0;
+    quizStats.toneErrors = q.tone_errors || {};
+  }
+
+  updateProgress();
+  renderTodayPanel();
+  renderTodayChecklist();
+  renderStreakBadge();
+  renderQuizStats();
+  renderVocab(currentVocabFilter);
+  showSyncStatus('已從雲端載入', 'teal');
+}
+
+// ── Save all to Supabase ──────────────────────────────────────
+let syncTimer = null;
+async function syncToSupabase() {
+  if (!SUPABASE_READY) return;
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(async () => {
+    const uid = getUserId();
+    const ok = await sbFetch('canton_progress', 'POST', {
+      user_id: uid,
+      reviewed: [...reviewedCards],
+      start_date: getStartDate(),
+      streak: streakCount,
+      last_study_date: lastStudyDate,
+      completed_today: [...completedToday],
+      notes: cardNotes,
+      updated_at: new Date().toISOString(),
+    });
+    showSyncStatus(ok ? '已同步' : '同步失敗', ok ? 'teal' : 'pink');
+  }, 1200);
+}
+
+function showSyncStatus(msg, color) {
+  const el = document.getElementById('sync-status');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.color = color === 'teal' ? 'var(--teal)' : color === 'pink' ? 'var(--pink)' : 'var(--text3)';
+  clearTimeout(el._timer);
+  el._timer = setTimeout(() => {
+    el.textContent = SUPABASE_READY ? '已連線' : '未設定 Supabase';
+    el.style.color = 'var(--text3)';
+  }, 3000);
+}
+
+// ── Speech ──────────────────────────────────────────────────
+let voices = [];
+let cantoneseVoice = null;
+let mandarinVoice = null;
+let voiceReady = false;
+
+function loadVoices() {
+  voices = speechSynthesis.getVoices();
+  cantoneseVoice = voices.find(v =>
+    v.lang === 'zh-HK' || v.lang === 'yue' || v.lang === 'yue-HK' ||
+    v.name.toLowerCase().includes('cantonese') ||
+    v.name.toLowerCase().includes('sin-ji') ||
+    v.name.toLowerCase().includes('sinji') ||
+    v.name.includes('香港')
+  ) || null;
+  mandarinVoice = voices.find(v =>
+    v.lang === 'zh-TW' || v.lang === 'zh-CN' ||
+    v.name.toLowerCase().includes('mandarin') ||
+    v.name.includes('普通話') || v.name.includes('國語')
+  ) || voices.find(v => v.lang.startsWith('zh')) || null;
+  voiceReady = true;
+  if (!cantoneseVoice && (mandarinVoice || voices.some(v => v.lang.startsWith('zh')))) {
+    const n = document.getElementById('voice-notice');
+    if (n) n.style.display = 'block';
+  }
+}
+
+if (speechSynthesis.onvoiceschanged !== undefined) {
+  speechSynthesis.onvoiceschanged = loadVoices;
+}
+loadVoices();
+
+function speak(text, btnEl) {
+  if (!('speechSynthesis' in window)) return;
+  speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  const v = cantoneseVoice || mandarinVoice || voices.find(v => v.lang.startsWith('zh')) || null;
+  if (v) utt.voice = v;
+  utt.lang = cantoneseVoice ? (cantoneseVoice.lang || 'zh-HK') : 'zh-HK';
+  utt.rate = 0.85;
+  utt.pitch = 1;
+  if (btnEl) {
+    btnEl.classList.add('playing');
+    utt.onend = () => btnEl.classList.remove('playing');
+    utt.onerror = () => btnEl.classList.remove('playing');
+  }
+  speechSynthesis.speak(utt);
+}
+
+function speakQuiz(e) {
+  e.stopPropagation();
+  if (!currentQ) return;
+  speak(currentQ.char, document.getElementById('quiz-speak-btn'));
+}
+
+function addToneCardSpeakBtns() {
+  const toneWords = ['詩','史','試','時','市','事','色','錫','食'];
+  document.querySelectorAll('.tone-card').forEach((card, i) => {
+    if (i >= toneWords.length) return;
+    const word = toneWords[i];
+    const btn = document.createElement('button');
+    btn.className = 'tone-card-speak';
+    btn.title = '播放發音';
+    btn.textContent = '▶';
+    btn.onclick = (e) => { e.stopPropagation(); speak(word, btn); };
+    card.appendChild(btn);
+  });
+}
+
+// ── Vocab progress tracking ─────────────────────────────────
+const reviewedCards = new Set(
+  JSON.parse(localStorage.getItem('canton_reviewed') || '[]')
+);
+
+function saveReviewed() {
+  try { localStorage.setItem('canton_reviewed', JSON.stringify([...reviewedCards])); } catch(e) {}
+  syncToSupabase();
+}
+
+function getDayTotal(day) {
+  return vocabData.filter(v => v.day === day).length;
+}
+function getDayReviewed(day) {
+  return vocabData.filter(v => v.day === day && reviewedCards.has(v.day + '_' + v.char)).length;
+}
+
+function updateProgress() {
+  const total = vocabData.length;
+  const done = reviewedCards.size;
+  const pct = total > 0 ? Math.round(done / total * 100) : 0;
+  const countEl = document.getElementById('vp-total-count');
+  const fillEl = document.getElementById('vp-total-fill');
+  if (countEl) countEl.textContent = done + ' / ' + total;
+  if (fillEl) {
+    fillEl.style.width = pct + '%';
+    fillEl.className = 'vp-fill' + (pct === 100 ? ' complete' : '');
+  }
+  renderDayProgress();
+}
+
+function getWeekTotal(w) {
+  const startDay = (w-1)*7+1, endDay = w*7;
+  return vocabData.filter(v => v.day >= startDay && v.day <= endDay).length;
+}
+function getWeekReviewed(w) {
+  const startDay = (w-1)*7+1, endDay = w*7;
+  return vocabData.filter(v => v.day >= startDay && v.day <= endDay && reviewedCards.has(v.day + '_' + v.char)).length;
+}
+
+function getWeekTotal(w) {
+  const s=(w-1)*7+1, e=w*7;
+  return vocabData.filter(v=>{const d=parseInt(v.day.replace('d',''));return d>=s&&d<=e;}).length;
+}
+function getWeekReviewed(w) {
+  const s=(w-1)*7+1, e=w*7;
+  return vocabData.filter(v=>{const d=parseInt(v.day.replace('d',''));return d>=s&&d<=e&&reviewedCards.has(v.day+'_'+v.char);}).length;
+}
+function renderDayProgress() {
+  const grid = document.getElementById('day-progress-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  for (let w=1; w<=8; w++) {
+    const total = getWeekTotal(w);
+    const done = getWeekReviewed(w);
+    const pct = total > 0 ? Math.round(done/total*100) : 0;
+    const isDone = pct === 100;
+    const cell = document.createElement('div');
+    cell.className = 'dp-cell';
+    cell.style.cursor = 'pointer';
+    cell.title = '第'+w+'週：點擊篩選';
+    const doneClass = isDone ? ' done' : '';
+    cell.innerHTML = '<div class="dp-label">W'+w+'</div><div class="dp-pct'+doneClass+'">'+pct+'%</div><div class="dp-mini"><div class="dp-mini-fill'+doneClass+'" style="width:'+pct+'%"></div></div>';
+    cell.addEventListener('click', () => {
+      const btn = document.querySelector('#vocab-day-filters .filter-btn:nth-child('+(w+1)+')');
+      if (btn) btn.click();
+    });
+    grid.appendChild(cell);
+  }
+}
+
+// ── Vocab render with speak button ──────────────────────────
+function buildVocabCard(v) {
+  const card = document.createElement('div');
+  const key = v.day + '_' + v.char;
+  const isReviewed = reviewedCards.has(key);
+  card.className = 'vocab-card' + (isReviewed ? ' revealed reviewed' : '');
+  const charText = v.char;
+  card.innerHTML = `
+    <div class="vc-top">
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="vc-char">${charText}</div>
+          <button class="speak-btn" title="播放發音">▶</button>
+        </div>
+        <div class="vc-jyut">${v.jyut}</div>
+        <div class="vc-check">✓ 已複習</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+        <span class="vc-tone-badge" style="background:${toneColors[v.tone]}22;color:${toneColors[v.tone]};border:1px solid ${toneColors[v.tone]}44">${v.tone} ${toneNames[v.tone]}</span>
+        <span class="vc-day">${v.day.replace('d','Day ')}</span>
+      </div>
+    </div>
+    <div class="vc-meaning">${v.zh}</div>
+    <div class="vc-hint">${v.hint}</div>
+  `;
+  card.querySelector('.speak-btn').addEventListener('click', (e) => { e.stopPropagation(); speak(charText, card.querySelector('.speak-btn')); });
+  card.addEventListener('click', () => {
+    card.classList.toggle('revealed');
+    if (card.classList.contains('revealed')) {
+      card.classList.add('reviewed');
+      reviewedCards.add(key);
+      saveReviewed();
+      updateProgress();
+    }
+  });
+  return card;
+}
+
+function renderVocabItems(items) {
+  const grid = document.getElementById('vocab-grid');
+  grid.innerHTML = '';
+  items.forEach(v => grid.appendChild(buildVocabCard(v)));
+}
+
+function renderVocab(filter) {
+  const grid = document.getElementById('vocab-grid');
+  grid.innerHTML = '';
+  const items = getItemsForFilter(filter);
+  items.forEach(v => {
+    const card = document.createElement('div');
+    const key = v.day + '_' + v.char;
+    const isReviewed = reviewedCards.has(key);
+    card.className = 'vocab-card' + (isReviewed ? ' revealed reviewed' : '');
+    const charText = v.char;
+    card.innerHTML = `
+      <div class="vc-top">
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="vc-char">${charText}</div>
+            <button class="speak-btn" title="播放發音">▶</button>
+          </div>
+          <div class="vc-jyut">${v.jyut}</div>
+          <div class="vc-check">✓ 已複習</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+          <span class="vc-tone-badge" style="background:${toneColors[v.tone]}22;color:${toneColors[v.tone]};border:1px solid ${toneColors[v.tone]}44">${v.tone} ${toneNames[v.tone]}</span>
+          <span class="vc-day">${v.day.replace('d','Day ')}</span>
+          <span class="note-indicator" title="有備註"></span>
+        </div>
+      </div>
+      <div class="vc-meaning">${v.zh}</div>
+      <div class="vc-hint">${v.hint}</div>
+      <textarea class="card-note-area" rows="2" placeholder="加備註…" data-key="${key}"></textarea>
+    `;
+    const speakBtn = card.querySelector('.speak-btn');
+    speakBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      speak(charText, speakBtn);
+    });
+    // Restore existing note
+    const textarea = card.querySelector('.card-note-area');
+    if (cardNotes[key]) {
+      textarea.value = cardNotes[key];
+      card.classList.add('has-note');
+    }
+    textarea.addEventListener('click', e => e.stopPropagation());
+    textarea.addEventListener('input', () => {
+      saveNote(key, textarea.value);
+      card.classList.toggle('has-note', !!textarea.value.trim());
+    });
+    card.addEventListener('click', () => {
+      card.classList.toggle('revealed');
+      if (card.classList.contains('revealed')) {
+        card.classList.add('reviewed');
+        reviewedCards.add(key);
+        saveReviewed();
+        updateProgress();
+      }
+    });
+    grid.appendChild(card);
+  });
+}
+
+let currentVocabFilter = 'all';
+function filterVocab(filter, btn) {
+  document.querySelectorAll('#vocab-day-filters .filter-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderVocab(filter);
+}
+
+function filterVocabBy(key, btn) {
+  document.querySelectorAll('#vocab-day-filters .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  let items;
+  if (key === 'all') {
+    items = vocabData;
+  } else if (key.startsWith('w')) {
+    const w = parseInt(key.replace('w',''));
+    const s = (w-1)*7+1, e = w*7;
+    items = vocabData.filter(v => { const d=parseInt(v.day.replace('d','')); return d>=s&&d<=e; });
+  } else {
+    items = vocabData.filter(v => v.day === key);
+  }
+  renderVocabItems(items);
+}
+
+function getItemsForFilter(filter) {
+  if (filter === 'all') return vocabData;
+  if (filter.startsWith('w')) {
+    const w = parseInt(filter.replace('w',''));
+    const startDay = (w-1)*7+1, endDay = w*7;
+    return vocabData.filter(v => v.day >= startDay && v.day <= endDay);
+  }
+  if (filter.startsWith('d')) {
+    const d = parseInt(filter.replace('d',''));
+    return vocabData.filter(v => v.day === d);
+  }
+  return vocabData;
+}
+
+// ── Day tracking ────────────────────────────────────────────
+const weekPlan = [
+  null, // index 0 unused
+  {week:1, tones:'陰平 1 vs 陽平 4', tonesShort:'平調對比', quizWeek:'w12', ankiDays:[1,2,3,4,5,6,7]},
+  {week:2, tones:'陰平 1 vs 陽平 4', tonesShort:'平調對比', quizWeek:'w12', ankiDays:[8,9,10,11,12,13,14]},
+  {week:3, tones:'陰上 2 vs 陽上 5', tonesShort:'升調對比', quizWeek:'w34', ankiDays:[15,16,17,18,19,20,21]},
+  {week:4, tones:'陰上 2 vs 陽上 5', tonesShort:'升調對比', quizWeek:'w34', ankiDays:[22,23,24,25,26,27,28]},
+  {week:5, tones:'陰去 3 vs 陽去 6 + 入聲', tonesShort:'降調+入聲', quizWeek:'w56', ankiDays:[29,30,31,32,33,34,35]},
+  {week:6, tones:'陰去 3 vs 陽去 6 + 入聲', tonesShort:'降調+入聲', quizWeek:'w56', ankiDays:[36,37,38,39,40,41,42]},
+  {week:7, tones:'9 調混合隨機辨別', tonesShort:'混合測試', quizWeek:'w78', ankiDays:[43,44,45,46,47,48,49]},
+  {week:8, tones:'9 調混合隨機辨別', tonesShort:'混合測試', quizWeek:'w78', ankiDays:[50,51,52,53,54,55,56]},
+];
+
+const earlyFinishMsg = {
+  'w12': '本週聲調任務（陰平 vs 陽平）今天提早做完了。<br><br>建議用剩餘時間：<strong>把今天的 Anki 詞卡多聽 2–3 遍</strong>，重點聽入聲調的截斷感。不要跳到下週的聲調對——感知類別的鞏固需要睡眠週期，提早接觸新內容只會干擾正在形成的記憶。',
+  'w34': '本週聲調任務（陰上 vs 陽上）今天提早做完了。<br><br>建議用剩餘時間：<strong>回頭複習上週的平調詞卡</strong>，測試自己在陰平、陽平、陰上三調混合時是否還能穩定辨別。這是一個很好的鞏固機會。',
+  'w56': '本週聲調任務（陰去 + 入聲）今天提早做完了。<br><br>建議用剩餘時間：<strong>做三組對的混合練習</strong>——把平調、升調、降調放在一起聽辨，提前適應下週的混合測試。這是唯一一個可以稍微「預習」的時機。',
+  'w78': '本週是混合測試週，提早做完表示聲調感知已經相當穩固。<br><br>建議用剩餘時間：<strong>開始聆聽分級粵語材料</strong>，專注在能辨認出的聲調，不求理解意思。你的耳朵已經準備好接收真實語料了。',
+};
+
+function getStartDate() {
+  try { return localStorage.getItem('canton_start_date') || null; } catch(e) { return null; }
+}
+function saveStartDate() {
+  const inp = document.getElementById('start-date-input');
+  if (!inp || !inp.value) return;
+  try { localStorage.setItem('canton_start_date', inp.value); } catch(e) {}
+  syncToSupabase();
+  renderTodayPanel();
+}
+function resetStartDate() {
+  try { localStorage.removeItem('canton_start_date'); } catch(e) {}
+  renderTodayPanel();
+}
+
+function getDayNumber(startDateStr) {
+  const start = new Date(startDateStr);
+  const today = new Date();
+  start.setHours(0,0,0,0);
+  today.setHours(0,0,0,0);
+  const diff = Math.floor((today - start) / 86400000) + 1;
+  return Math.max(1, diff);
+}
+
+function getWeekNumber(dayNum) {
+  return Math.min(8, Math.ceil(dayNum / 7));
+}
+
+function renderTodayPanel() {
+  const startDate = getStartDate();
+  const setupCard = document.getElementById('start-setup-card');
+  const banner = document.getElementById('day-banner');
+  const earlyCard = document.getElementById('early-finish-card');
+
+  if (!startDate) {
+    if (setupCard) setupCard.style.display = 'block';
+    if (banner) banner.style.display = 'none';
+    if (earlyCard) earlyCard.style.display = 'none';
+    // Set default date to today
+    const inp = document.getElementById('start-date-input');
+    if (inp) inp.valueAsDate = new Date();
+    return;
+  }
+
+  if (setupCard) setupCard.style.display = 'none';
+  if (banner) banner.style.display = 'block';
+
+  const dayNum = getDayNumber(startDate);
+  const weekNum = getWeekNumber(dayNum);
+  const plan = weekPlan[weekNum] || weekPlan[8];
+  const dayInWeek = ((dayNum - 1) % 7) + 1;
+  const ankiDay = plan.ankiDays[dayInWeek - 1];
+  const totalDays = 56;
+  const phasePct = Math.min(100, Math.round((dayNum / totalDays) * 100));
+  const isAhead = dayNum > totalDays;
+
+  // Banner
+  const bigEl = document.getElementById('day-counter-big');
+  const weekLabelEl = document.getElementById('day-week-label');
+  const tonTaskEl = document.getElementById('day-tone-task');
+  const ankiTaskEl = document.getElementById('day-anki-task');
+  const pctEl = document.getElementById('day-phase-pct');
+  const fillEl = document.getElementById('day-phase-fill');
+
+  if (bigEl) bigEl.textContent = isAhead ? '第一階段完成！' : 'Day ' + dayNum;
+  if (weekLabelEl) weekLabelEl.textContent = isAhead ? '可進入第二階段' : '第 ' + weekNum + ' 週 · 共 56 天';
+  if (tonTaskEl) tonTaskEl.textContent = plan.tones;
+  if (ankiTaskEl) ankiTaskEl.textContent = isAhead ? '維持 Anki 複習' : '今日詞卡：Day ' + ankiDay + '（10 張）';
+  if (pctEl) pctEl.textContent = phasePct + '%';
+  if (fillEl) { fillEl.style.width = phasePct + '%'; fillEl.style.background = phasePct >= 100 ? 'var(--teal)' : 'var(--amber)'; }
+
+  // Today block desc
+  const toneDescEl = document.getElementById('today-tone-desc');
+  const ankiDescEl = document.getElementById('today-anki-desc');
+  const toneTargetEl = document.getElementById('today-tone-target');
+  const ankiTargetEl = document.getElementById('today-anki-target');
+  const toneBarEl = document.getElementById('today-tone-bar');
+  const ankiBarEl = document.getElementById('today-anki-bar');
+
+  if (toneDescEl) toneDescEl.innerHTML = '週 ' + weekNum + '：練 <strong>' + plan.tones + '</strong>。點左側「聲調練習」選對應週次。';
+  if (ankiDescEl) ankiDescEl.textContent = '今日新增：Day ' + ankiDay + ' 的 10 張詞卡（點「詞卡瀏覽」→ Day ' + (ankiDay > 7 ? 7 : ankiDay) + ' 預習）。';
+  if (toneTargetEl) toneTargetEl.textContent = plan.tonesShort;
+  if (ankiTargetEl) ankiTargetEl.textContent = '今日 Day ' + ankiDay;
+
+  // Progress bars: day in week / 7
+  const weekPct = Math.round((dayInWeek / 7) * 100);
+  if (toneBarEl) toneBarEl.style.width = weekPct + '%';
+  if (ankiBarEl) ankiBarEl.style.width = weekPct + '%';
+
+  // Sub title
+  const subEl = document.getElementById('today-sub');
+  if (subEl) subEl.textContent = '每晚睡前 40 分鐘 · 第 ' + weekNum + ' 週第 ' + dayInWeek + ' 天';
+
+  // Badge label
+  const badgeEl = document.getElementById('today-badge-label');
+  if (badgeEl) badgeEl.textContent = isAhead ? '第一階段完成' : 'Day ' + dayNum + ' · 今晚練習';
+
+  // Early finish card
+  const vocabReviewed = reviewedCards.size;
+  const vocabInWeek = 7 * 10;
+  const vocabDoneThisWeek = vocabData.filter(v => {
+    const dNum = parseInt(v.day.replace('d',''));
+    const startDay = (weekNum - 1) * 7 + 1;
+    return dNum >= startDay && dNum <= startDay + 6 && reviewedCards.has(v.day + '_' + v.char);
+  }).length;
+
+  if (earlyCard) {
+    if (dayInWeek < 7 && vocabDoneThisWeek >= vocabInWeek) {
+      earlyCard.style.display = 'block';
+      const bodyEl = document.getElementById('early-finish-body');
+      if (bodyEl) bodyEl.innerHTML = earlyFinishMsg[plan.quizWeek] || '';
+    } else {
+      earlyCard.style.display = 'none';
+    }
+  }
+}
+
+// ── Init ────────────────────────────────────────────────────
+buildChoices();
+nextQuestion();
+renderVocab('all');
+updateProgress();
+renderTodayPanel();
+renderTodayChecklist();
+renderStreakBadge();
+renderQuizStats();
+setTimeout(addToneCardSpeakBtns, 150);
+loadFromSupabase();
+</script>
+</body>
+</html>
