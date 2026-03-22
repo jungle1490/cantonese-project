@@ -2,7 +2,9 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>粵語學習助手</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -36,6 +38,7 @@ body {
   min-height: 100vh;
   font-size: 15px;
   line-height: 1.6;
+  overflow-x: hidden;
 }
 
 /* Layout */
@@ -508,13 +511,146 @@ body {
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 
 /* Mobile */
-@media(max-width:680px){
-  .sidebar{ width:100%; height:auto; position:static; flex-direction:row; flex-wrap:wrap; padding:12px; gap:4px; }
-  .logo{ display:none; }
-  .nav-sep{ display:none; }
-  .main{ padding:16px; }
-  .tone-grid, .choice-grid{ grid-template-columns:repeat(3,1fr); }
-  .vocab-grid, .progress-grid{ grid-template-columns:1fr; }
+/* ── Mobile (iOS / Android) ─────────────────────────────── */
+@media(max-width:700px){
+  /* Layout: sidebar becomes bottom nav */
+  .app { flex-direction: column; }
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: auto;
+    flex-direction: row;
+    padding: 0;
+    padding-bottom: env(safe-area-inset-bottom);
+    border-right: none;
+    border-top: 1px solid var(--border);
+    z-index: 100;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 0;
+    -webkit-overflow-scrolling: touch;
+  }
+  .logo { display: none; }
+  .nav-sep { display: none; }
+  .nav-item {
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 4px 10px;
+    border-radius: 0;
+    border: none;
+    font-size: 10px;
+    gap: 3px;
+    min-width: 52px;
+    white-space: nowrap;
+  }
+  .nav-item.active {
+    border: none;
+    border-top: 2px solid var(--amber);
+    background: var(--amber-dim);
+  }
+  .nav-icon { font-size: 17px; width: auto; }
+  #sync-status { display: none; }
+
+  /* Main content: add bottom padding for nav bar */
+  .main {
+    padding: 16px 14px calc(80px + env(safe-area-inset-bottom));
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  /* Page titles */
+  .page-title { font-size: 20px; }
+  .page-sub { font-size: 12px; margin-bottom: 18px; }
+
+  /* Cards */
+  .card { padding: 14px 14px; }
+
+  /* Grids → single column */
+  .vocab-grid,
+  .progress-grid,
+  .why-grid,
+  .tip-grid,
+  .summary-grid,
+  .schedule-grid { grid-template-columns: 1fr !important; }
+
+  /* Day progress: 4 per row on mobile */
+  .day-progress-grid { grid-template-columns: repeat(4, 1fr) !important; }
+
+  /* Tone grid: 3 per row */
+  .tone-grid { grid-template-columns: repeat(3, 1fr); }
+
+  /* Choice grid: 2 per row for w12/w34, handled below */
+  .choice-grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* Quiz area */
+  .quiz-area { padding: 18px 14px; min-height: 120px; }
+  .quiz-word { font-size: 40px; }
+
+  /* Score row */
+  .score-row { gap: 8px; }
+  .score-num { font-size: 22px; }
+
+  /* Time blocks */
+  .time-block { flex-direction: column; }
+  .tb-time {
+    width: 100%;
+    height: 32px;
+    font-size: 11px;
+    border-radius: 0;
+    justify-content: flex-start;
+    padding: 0 12px;
+  }
+
+  /* Phase tabs */
+  .phase-tabs, .phase-nav { gap: 4px; }
+  .ptab, .pnav { font-size: 10px; padding: 7px 4px; }
+
+  /* Week schedule */
+  .week-row { flex-direction: column; gap: 4px; }
+  .wr-week { width: auto; }
+
+  /* Vocab filters: scrollable row */
+  .vocab-filters {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+  }
+  .filter-btn { flex-shrink: 0; }
+
+  /* Day banner */
+  #day-banner > div:first-child { flex-direction: column; gap: 8px; }
+
+  /* Today checklist task check btn */
+  .task-check-btn { width: 34px; height: 34px; font-size: 15px; }
+
+  /* SVG tone curves — scale down */
+  .tone-curves svg { max-height: 160px; }
+
+  /* Prevent horizontal overflow */
+  * { max-width: 100%; }
+  svg { overflow: visible; }
+  pre, code { white-space: pre-wrap; word-break: break-all; }
+
+  /* Textarea notes */
+  .card-note-area { font-size: 13px; }
+
+  /* Btn row */
+  .btn-row { flex-direction: column; }
+  .btn-row .abtn { width: 100%; text-align: left; }
+}
+
+/* Extra small phones */
+@media(max-width:380px){
+  .tone-grid { grid-template-columns: repeat(2, 1fr); }
+  .day-progress-grid { grid-template-columns: repeat(4, 1fr) !important; }
+  .nav-item { font-size: 9px; min-width: 44px; }
 }
 </style>
 </head>
