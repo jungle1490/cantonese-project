@@ -782,7 +782,7 @@ body {
     <div class="progress-grid">
       <div class="progress-card">
         <div class="pc-label">聲調目標</div>
-        <div class="pc-val" id="today-tone-target">陰平 vs 陽平</div>
+        <div class="pc-val" id="today-tone-target">陰平 1 vs 陽平 4</div>
         <div class="pc-bar"><div class="pc-fill" id="today-tone-bar" style="width:0%;background:#e8a838"></div></div>
       </div>
       <div class="progress-card">
@@ -815,9 +815,9 @@ body {
     <div class="week-row">
       <div class="wr-week">週 1–2</div>
       <div class="wr-content">
-        <div class="wr-title">陰平 vs 陽平 <span class="wr-badge badge-now">現在</span></div>
+        <div class="wr-title">陰平 1 高平（55）vs 陽平 4 低降（21）<span class="wr-badge badge-now">現在</span></div>
         <div class="wr-detail">
-          <span class="tone-pill">詩 si1 高平</span><span class="tone-pill">時 si4 低平</span>
+          <span class="tone-pill">詩 si1 高平 55</span><span class="tone-pill">時 si4 低降 21</span>
           · Anki Day 1–14（140 張）
         </div>
       </div>
@@ -837,7 +837,7 @@ body {
       <div class="wr-content">
         <div class="wr-title">陰去 vs 陽去 + 入聲截斷感 <span class="wr-badge badge-later">之後</span></div>
         <div class="wr-detail">
-          <span class="tone-pill">試 si3 高降</span><span class="tone-pill">事 si6 低降</span><span class="tone-pill">食 sik9 低入</span>
+          <span class="tone-pill">試 si3 中平</span><span class="tone-pill">事 si6 低平</span><span class="tone-pill">食 sik9 低入</span>
           · Anki 加入入聲詞
         </div>
       </div>
@@ -913,24 +913,24 @@ body {
       <polygon points="200,29 210,31 205,40" fill="#5b9cf6"/>
       <text x="145" y="24" font-size="10" fill="#5b9cf6" font-family="DM Mono, monospace">2 陰上</text>
       <text x="145" y="128" font-size="11" fill="#8a8880" font-family="Noto Serif TC, serif">史 si2</text>
-      <!-- 3 陰去: 高降 -->
-      <line x1="240" y1="44" x2="302" y2="120" stroke="#a78bfa" stroke-width="2.5" stroke-linecap="round"/>
-      <polygon points="296,118 306,122 300,112" fill="#a78bfa"/>
+      <!-- 3 陰去: 中平 33 -->
+      <line x1="240" y1="82" x2="302" y2="82" stroke="#a78bfa" stroke-width="2.5" stroke-linecap="round"/>
+      <polygon points="298,76 308,82 298,88" fill="#a78bfa"/>
       <text x="240" y="34" font-size="10" fill="#a78bfa" font-family="DM Mono, monospace">3 陰去</text>
-      <text x="240" y="143" font-size="11" fill="#8a8880" font-family="Noto Serif TC, serif">試 si3</text>
-      <!-- 4 陽平: 低平 -->
-      <line x1="48" y1="170" x2="110" y2="170" stroke="#f97316" stroke-width="2.5" stroke-linecap="round"/>
-      <polygon points="106,165 114,170 106,175" fill="#f97316"/>
-      <text x="48" y="160" font-size="10" fill="#f97316" font-family="DM Mono, monospace">4 陽平</text>
-      <text x="48" y="188" font-size="11" fill="#8a8880" font-family="Noto Serif TC, serif">時 si4</text>
+      <text x="240" y="100" font-size="11" fill="#8a8880" font-family="Noto Serif TC, serif">試 si3</text>
+      <!-- 4 陽平: 低降 21/11 -->
+      <line x1="48" y1="140" x2="110" y2="178" stroke="#f97316" stroke-width="2.5" stroke-linecap="round"/>
+      <polygon points="104,172 114,178 106,167" fill="#f97316"/>
+      <text x="48" y="128" font-size="10" fill="#f97316" font-family="DM Mono, monospace">4 陽平</text>
+      <text x="48" y="196" font-size="11" fill="#8a8880" font-family="Noto Serif TC, serif">時 si4</text>
       <!-- 5 陽上: 低升 -->
       <line x1="145" y1="170" x2="207" y2="120" stroke="#3ec4a0" stroke-width="2.5" stroke-linecap="round"/>
       <polygon points="200,116 210,120 202,128" fill="#3ec4a0"/>
       <text x="145" y="160" font-size="10" fill="#3ec4a0" font-family="DM Mono, monospace">5 陽上</text>
       <text x="145" y="188" font-size="11" fill="#8a8880" font-family="Noto Serif TC, serif">市 si5</text>
-      <!-- 6 陽去: 低降 -->
-      <line x1="240" y1="120" x2="302" y2="170" stroke="#8a8880" stroke-width="2.5" stroke-linecap="round"/>
-      <polygon points="296,168 306,172 298,162" fill="#8a8880"/>
+      <!-- 6 陽去: 低平 22 -->
+      <line x1="240" y1="162" x2="302" y2="162" stroke="#8a8880" stroke-width="2.5" stroke-linecap="round"/>
+      <polygon points="298,156 308,162 298,168" fill="#8a8880"/>
       <text x="240" y="110" font-size="10" fill="#8a8880" font-family="DM Mono, monospace">6 陽去</text>
       <text x="240" y="188" font-size="11" fill="#8a8880" font-family="Noto Serif TC, serif">事 si6</text>
       <!-- Divider -->
@@ -949,9 +949,10 @@ body {
       <text x="390" y="172" font-size="12" fill="#e06b8a" font-family="Noto Serif TC, serif" text-anchor="middle">食 sik9</text>
       <text x="390" y="193" font-size="10" fill="#8a8880" font-family="DM Mono, monospace" text-anchor="middle">低入</text>
       <!-- annotations -->
-      <text x="470" y="50" font-size="11" fill="#555450" font-family="Outfit, sans-serif">平聲 1+4 = 平著走</text>
+      <text x="470" y="50" font-size="11" fill="#555450" font-family="Outfit, sans-serif">平聲 1 = 高平 / 4 = 低降</text>
       <text x="470" y="95" font-size="11" fill="#555450" font-family="Outfit, sans-serif">上聲 2+5 = 往上升</text>
-      <text x="470" y="145" font-size="11" fill="#555450" font-family="Outfit, sans-serif">去聲 3+6 = 往下降</text>
+      <text x="470" y="100" font-size="11" fill="#555450" font-family="Outfit, sans-serif">去聲 3 = 中平（33）</text>
+      <text x="470" y="145" font-size="11" fill="#555450" font-family="Outfit, sans-serif">去聲 6 = 低平（22）</text>
       <text x="470" y="180" font-size="11" fill="#555450" font-family="Outfit, sans-serif">入聲 7+8+9 = 截斷</text>
     </svg>
     <div style="font-size:11px;color:var(--text3)">陰調（1·2·3·7）音高偏高 · 陽調（4·5·6·9）音高偏低 · 中入（8）居中</div>
@@ -962,8 +963,8 @@ body {
       <div class="tc-num">調 1 · 陰平</div>
       <div class="tc-cant">詩</div>
       <div class="tc-jyut">si1</div>
-      <div class="tc-name">高平不動 ——</div>
-      <div class="tc-name" style="display:none;margin-top:6px;font-size:11px;color:var(--text2)">最高音區，保持不變。像唱歌時的長音。vs 陽平 4：起點差一個音區。</div>
+      <div class="tc-name">高平（55/53）——</div>
+      <div class="tc-name" style="display:none;margin-top:6px;font-size:11px;color:var(--text2)">調值 55/53，最高音區，大致平穩（有時輕微下滑）。vs 陽平 4（21/11）：一個在頂、一個往下降，是完全不同的走勢。</div>
     </div>
     <div class="tone-card" onclick="toggleTone(this)">
       <div class="tc-num">調 2 · 陰上</div>
@@ -976,15 +977,15 @@ body {
       <div class="tc-num">調 3 · 陰去</div>
       <div class="tc-cant">試</div>
       <div class="tc-jyut">si3</div>
-      <div class="tc-name">高位緩降 ↘</div>
-      <div class="tc-name" style="display:none;margin-top:6px;font-size:11px;color:var(--text2)">從中高位緩慢下降。不是普通話四聲的急降，起點較低、降幅較小。</div>
+      <div class="tc-name">中音平穩 ——</div>
+      <div class="tc-name" style="display:none;margin-top:6px;font-size:11px;color:var(--text2)">調值 33，穩定的中音平調。不是降調。和陽去 6（低平 22）的差別只在音高高低，不在走勢。</div>
     </div>
     <div class="tone-card" onclick="toggleTone(this)">
       <div class="tc-num">調 4 · 陽平</div>
       <div class="tc-cant">時</div>
       <div class="tc-jyut">si4</div>
-      <div class="tc-name">低平不動 ——</div>
-      <div class="tc-name" style="display:none;margin-top:6px;font-size:11px;color:var(--text2)">最低音區，保持平穩。和陰平 1 形狀一樣，只是整體音高低一個音區。</div>
+      <div class="tc-name">中低降到最低 ↘</div>
+      <div class="tc-name" style="display:none;margin-top:6px;font-size:11px;color:var(--text2)">調值 21/11，從中低音降到最低音。這是粵語六個舒聲調裡唯一的低降調。和陰平 1（高平）形狀相反，不要混淆。</div>
     </div>
     <div class="tone-card" onclick="toggleTone(this)">
       <div class="tc-num">調 5 · 陽上</div>
@@ -997,8 +998,8 @@ body {
       <div class="tc-num">調 6 · 陽去</div>
       <div class="tc-cant">事</div>
       <div class="tc-jyut">si6</div>
-      <div class="tc-name">低位往下降 ↘</div>
-      <div class="tc-name" style="display:none;margin-top:6px;font-size:11px;color:var(--text2)">從中低位往下降。vs 陰去 3：起點更低，整體在低音區。</div>
+      <div class="tc-name">低音平穩 ——</div>
+      <div class="tc-name" style="display:none;margin-top:6px;font-size:11px;color:var(--text2)">調值 22，穩定的低音平調。不是降調。和陰去 3（中平 33）都是平的，差別只在一個在中音區、一個在低音區。</div>
     </div>
     <div class="tone-card" onclick="toggleTone(this)" style="border-color:rgba(224,107,138,0.25)">
       <div class="tc-num">調 7 · 陰入</div>
@@ -1032,7 +1033,7 @@ body {
   <div class="vocab-filters" id="quiz-week-filters">
     <button class="filter-btn active" onclick="setQuizWeek('w12',this)">週 1–2：平調</button>
     <button class="filter-btn" onclick="setQuizWeek('w34',this)">週 3–4：升調</button>
-    <button class="filter-btn" onclick="setQuizWeek('w56',this)">週 5–6：降調+入聲</button>
+    <button class="filter-btn" onclick="setQuizWeek('w56',this)">週 5–6：去聲+入聲</button>
     <button class="filter-btn" onclick="setQuizWeek('w78',this)">週 7–8：混合 9 調</button>
   </div>
 
@@ -1117,7 +1118,7 @@ body {
     <div class="card-title">中文母語者的特定注意事項</div>
     <div class="rule-item"><div class="rule-dot" style="background:var(--blue)"></div><div class="rule-body"><b>漢字是優勢，但聲調不會自動轉移。</b>你認識漢字，詞義不需要額外學習。但粵語聲調和普通話聲調是完全不同的感知系統，不能套用。</div></div>
     <div class="rule-item"><div class="rule-dot" style="background:var(--pink)"></div><div class="rule-body"><b>陽上 5 是最大的陷阱。</b>普通話三聲是先降後升，但粵語陽上 5 是純升。台灣人最容易把 5 調誤判為「類似三聲」，需要刻意建立新的感知類別。</div></div>
-    <div class="rule-item"><div class="rule-dot" style="background:var(--teal)"></div><div class="rule-body"><b>陰去 3 不是普通話四聲。</b>兩者都往下降，但陰去 3 起點較低、降幅較小、速度較緩。不要用「往下降的感覺就是 3 調」這個捷徑——在正常語速裡這幾乎必然失敗。</div></div>
+    <div class="rule-item"><div class="rule-dot" style="background:var(--teal)"></div><div class="rule-body"><b>去聲（3、6）是平調，不是降調。</b>陰去 3（33）中音平穩，陽去 6（22）低音平穩。反而是陽平 4（21/11）才是降調——從中低音降到最低。不要把「去聲」和「往下降」畫等號。</div></div>
   </div>
 </div>
 
@@ -1533,7 +1534,7 @@ const vocabData = [
   {day:'d28',char:'加埋',jyut:'gaa1 maai4',tone:1,zh:'加起來／合計',hint:'陰平接陽平'},
   {day:'d28',char:'共',jyut:'gung6',tone:6,zh:'共計',hint:'陽去 6，結算用'},
   // ── Day 29-35 (Week 5) ────────────────────────────────────
-  {day:'d29',char:'試',jyut:'si3',tone:3,zh:'試',hint:'陰去 3，降調練習'},
+  {day:'d29',char:'試',jyut:'si3',tone:3,zh:'試',hint:'陰去 3，中平調（調值 33）'},
   {day:'d29',char:'事',jyut:'si6',tone:6,zh:'事情',hint:'陽去 6，試 vs 事'},
   {day:'d29',char:'意',jyut:'ji3',tone:3,zh:'意思',hint:'陰去 3'},
   {day:'d29',char:'易',jyut:'ji6',tone:6,zh:'容易',hint:'陽去 6，意 vs 易'},
@@ -2345,20 +2346,20 @@ function getItemsForFilter(filter) {
 // ── Day tracking ────────────────────────────────────────────
 const weekPlan = [
   null, // index 0 unused
-  {week:1, tones:'陰平 1 vs 陽平 4', tonesShort:'平調對比', quizWeek:'w12', ankiDays:[1,2,3,4,5,6,7]},
-  {week:2, tones:'陰平 1 vs 陽平 4', tonesShort:'平調對比', quizWeek:'w12', ankiDays:[8,9,10,11,12,13,14]},
+  {week:1, tones:'陰平 1（高平）vs 陽平 4（低降）', tonesShort:'1 vs 4', quizWeek:'w12', ankiDays:[1,2,3,4,5,6,7]},
+  {week:2, tones:'陰平 1（高平）vs 陽平 4（低降）', tonesShort:'1 vs 4', quizWeek:'w12', ankiDays:[8,9,10,11,12,13,14]},
   {week:3, tones:'陰上 2 vs 陽上 5', tonesShort:'升調對比', quizWeek:'w34', ankiDays:[15,16,17,18,19,20,21]},
   {week:4, tones:'陰上 2 vs 陽上 5', tonesShort:'升調對比', quizWeek:'w34', ankiDays:[22,23,24,25,26,27,28]},
-  {week:5, tones:'陰去 3 vs 陽去 6 + 入聲', tonesShort:'降調+入聲', quizWeek:'w56', ankiDays:[29,30,31,32,33,34,35]},
-  {week:6, tones:'陰去 3 vs 陽去 6 + 入聲', tonesShort:'降調+入聲', quizWeek:'w56', ankiDays:[36,37,38,39,40,41,42]},
+  {week:5, tones:'陰去 3 vs 陽去 6 + 入聲', tonesShort:'去聲+入聲', quizWeek:'w56', ankiDays:[29,30,31,32,33,34,35]},
+  {week:6, tones:'陰去 3 vs 陽去 6 + 入聲', tonesShort:'去聲+入聲', quizWeek:'w56', ankiDays:[36,37,38,39,40,41,42]},
   {week:7, tones:'9 調混合隨機辨別', tonesShort:'混合測試', quizWeek:'w78', ankiDays:[43,44,45,46,47,48,49]},
   {week:8, tones:'9 調混合隨機辨別', tonesShort:'混合測試', quizWeek:'w78', ankiDays:[50,51,52,53,54,55,56]},
 ];
 
 const earlyFinishMsg = {
-  'w12': '本週聲調任務（陰平 vs 陽平）今天提早做完了。<br><br>建議用剩餘時間：<strong>把今天的 Anki 詞卡多聽 2–3 遍</strong>，重點聽入聲調的截斷感。不要跳到下週的聲調對——感知類別的鞏固需要睡眠週期，提早接觸新內容只會干擾正在形成的記憶。',
+  'w12': '本週聲調任務（陰平 1 高平 vs 陽平 4 低降）今天提早做完了。<br><br>建議用剩餘時間：<strong>把今天的 Anki 詞卡多聽 2–3 遍</strong>，留意陽平 4 的下降走勢和陰平 1 的高平走勢的對比。不要跳到下週的聲調對——感知類別的鞏固需要睡眠週期。',
   'w34': '本週聲調任務（陰上 vs 陽上）今天提早做完了。<br><br>建議用剩餘時間：<strong>回頭複習上週的平調詞卡</strong>，測試自己在陰平、陽平、陰上三調混合時是否還能穩定辨別。這是一個很好的鞏固機會。',
-  'w56': '本週聲調任務（陰去 + 入聲）今天提早做完了。<br><br>建議用剩餘時間：<strong>做三組對的混合練習</strong>——把平調、升調、降調放在一起聽辨，提前適應下週的混合測試。這是唯一一個可以稍微「預習」的時機。',
+  'w56': '本週聲調任務（去聲 + 入聲）今天提早做完了。<br><br>建議用剩餘時間：<strong>做三組對的混合練習</strong>——把平調、升調、去聲放在一起聽辨，提前適應下週的混合測試。這是唯一一個可以稍微「預習」的時機。',
   'w78': '本週是混合測試週，提早做完表示聲調感知已經相當穩固。<br><br>建議用剩餘時間：<strong>開始聆聽分級粵語材料</strong>，專注在能辨認出的聲調，不求理解意思。你的耳朵已經準備好接收真實語料了。',
 };
 
@@ -2441,7 +2442,7 @@ function renderTodayPanel() {
   const toneBarEl = document.getElementById('today-tone-bar');
   const ankiBarEl = document.getElementById('today-anki-bar');
 
-  if (toneDescEl) toneDescEl.innerHTML = '週 ' + weekNum + '：練 <strong>' + plan.tones + '</strong>。點左側「聲調練習」選對應週次。';
+  if (toneDescEl) toneDescEl.innerHTML = '週 ' + weekNum + '：練 <strong>' + plan.tones + '</strong>（調值：' + (weekNum<=2?'55 vs 21':weekNum<=4?'35 vs 13':'33 vs 22') + '）。點左側「聲調練習」選對應週次。';
   if (ankiDescEl) ankiDescEl.textContent = '今日新增：Day ' + ankiDay + ' 的 10 張詞卡（點「詞卡瀏覽」→ Day ' + (ankiDay > 7 ? 7 : ankiDay) + ' 預習）。';
   if (toneTargetEl) toneTargetEl.textContent = plan.tonesShort;
   if (ankiTargetEl) ankiTargetEl.textContent = '今日 Day ' + ankiDay;
